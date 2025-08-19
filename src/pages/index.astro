@@ -1,59 +1,35 @@
 ---
 import VideoScrubber from '../components/VideoScrubber.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import Research from '../components/Research.astro';
+import Experience from '../components/Experience.astro';
+import Publications from '../components/Publications.astro';
+import Contact from '../components/Contact.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/site.css';
 ---
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="top">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Astro Video Scrubber Site</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      overflow-x: hidden;
-      min-height: 300vh;
-      background-color: #000;
-      color: #fff;
-    }
-
-    main {
-      position: relative;
-      z-index: 1;
-      padding: 2rem;
-      text-align: center;
-    }
-
-    section {
-      padding: 100vh 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 2em;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    }
-  </style>
+  <title>Jordan Moreno — Personal Site</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
 </head>
 <body>
-  <VideoScrubber client:load />
-
+  <VideoScrubber />
+  <Header />
   <main>
-    <section>
-      <h1>Welcome to My Interactive Site!</h1>
-    </section>
-    <section>
-      <h2>Scroll down to see the magic unfold...</h2>
-    </section>
-    <section>
-      <p>This content exists to make the page scrollable and activate the video effect.</p>
-    </section>
-    <section>
-      <h3>...and scroll up to rewind!</h3>
-    </section>
-    <section>
-      <p>Enjoy the experience!</p>
-    </section>
+    <Hero />
+    <About />
+    <Research />
+    <Experience />
+    <Publications />
+    <Contact />
   </main>
+  <Footer />
 </body>
 </html>

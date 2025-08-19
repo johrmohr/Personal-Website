@@ -1,0 +1,19 @@
+---
+const nav = [
+  { href: '#about', label: 'About' },
+  { href: '#research', label: 'Research' },
+  { href: '#experience', label: 'Experience' },
+  { href: '#publications', label: 'Publications' },
+  { href: '#contact', label: 'Contact' }
+];
+---
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="#top">Jordan Moreno</a>
+    <nav class="nav">
+      {nav.map((item) => (
+        <a href={item.href}>{item.label}</a>
+      ))}
+    </nav>
+  </div>
+</header>
