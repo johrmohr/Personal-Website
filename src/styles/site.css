@@ -74,23 +74,23 @@ img { max-width: 100%; display: block; height: auto; }
 .landing { min-height: 100vh; display: flex; align-items: stretch; }
 .landing .container { width: 100%; display: flex; flex-direction: column; align-items: center; }
 
-.landing-header { text-align: center; margin-top: 120px; }
+.landing-header { text-align: center; margin-top: 180px; }
 .landing-title { font-size: 72px; font-weight: 800; letter-spacing: 1.5px; margin: 0; line-height: 1.1; }
-.landing-subrow { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; }
+.landing-subrow { display: inline-flex; align-items: center; gap: 8px; margin-top: 36px; }
 .landing-subtitle { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; letter-spacing: 1.2px; opacity: 0.9; }
 .socials-icons { display: inline-flex; gap: 12px; position: relative; left: 12px; }
 .icon-link { color: var(--muted); display: inline-flex; align-items: center; }
 .icon-link:hover { color: var(--primary-strong); }
 
-.landing-spacer { height: 50px; }
+.landing-spacer { height: 36px; }
 
 .landing-center { 
   text-align: center; 
   display: grid; 
-  gap: 8px; 
+  gap: 36px; 
   align-items: center; 
   justify-items: center;
-  margin-top: 100px;
+  margin-top: 0px;
 }
 .ascii { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; color: var(--text); opacity: 0.95; margin: 0; white-space: pre; }
 .info-line { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; opacity: 0.9; letter-spacing: 1px; }
@@ -194,8 +194,10 @@ img { max-width: 100%; display: block; height: auto; }
 }
 
 /* Safari-specific adjustment */
-_::-webkit-full-page-media, _:future, :root .landing-center {
-  margin-top: 130px;
+@supports (-webkit-hyphens:none) {
+  .landing-center {
+    margin-top: 30px;
+  }
 }
 
 /* Mobile title adjustment */
@@ -204,13 +206,26 @@ _::-webkit-full-page-media, _:future, :root .landing-center {
     font-size: 48px;
   }
   .landing-header {
-    margin-top: 100px;
+    margin-top: 120px;
+  }
+  .landing-subrow {
+    margin-top: 65px;
+  }
+  .landing-spacer {
+    height: 65px;
   }
   .landing-center {
-    margin-top: 80px;
+    gap: 65px;
+    margin-top: 0px;
   }
-  _::-webkit-full-page-media, _:future, :root .landing-center {
-    margin-top: 110px;
+}
+
+/* Safari mobile adjustment */
+@supports (-webkit-hyphens:none) {
+  @media (max-width: 768px) {
+    .landing-center {
+      margin-top: 30px;
+    }
   }
 }
 
