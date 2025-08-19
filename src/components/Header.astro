@@ -7,7 +7,7 @@ const nav = [
   { href: '#contact', label: 'Contact' }
 ];
 ---
-<header class="site-header">
+<header class="site-header" id="site-header">
   <div class="container header-inner">
     <a class="brand" href="#top">Jordan Moreno</a>
     <nav class="nav">
@@ -17,3 +17,23 @@ const nav = [
     </nav>
   </div>
 </header>
+
+<script>
+  const header = document.getElementById('site-header');
+  let lastScrollY = window.scrollY;
+
+  function updateHeader() {
+    const currentScrollY = window.scrollY;
+    
+    if (currentScrollY > 100) {
+      header.classList.add('visible');
+    } else {
+      header.classList.remove('visible');
+    }
+    
+    lastScrollY = currentScrollY;
+  }
+
+  window.addEventListener('scroll', updateHeader, { passive: true });
+  updateHeader(); // Initialize
+</script>
