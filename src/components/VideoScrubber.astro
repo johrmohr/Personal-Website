@@ -1,0 +1,74 @@
+<div class="video-container">
+  <video id="background-video" preload="auto" muted playsinline webkit-playsinline>
+    <source src="/BlackHole_hq.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+<style>
+  .video-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    z-index: -1;
+  }
+
+  #background-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.05);
+  }
+</style>
+
+<script>
+  const video = document.getElementById('background-video') as HTMLVideoElement;
+  let ticking = false;
+  let lastKnownScrollPosition = 0;
+
+  function updateVideoTime() {
+    const scrollY = lastKnownScrollPosition;
+    const totalScrollHeight = document.body.scrollHeight - window.innerHeight;
+
+    if (totalScrollHeight > 0) {
+      const scrollProgress = scrollY / totalScrollHeight;
+      const targetTime = scrollProgress * video.duration;
+      
+      // Only update if the time difference is significant enough to avoid micro-updates
+      if (Math.abs(video.currentTime - targetTime) > 0.01) {
+        video.currentTime = targetTime;
+      }
+    }
+    
+    ticking = false;
+  }
+
+  function onScroll() {
+    lastKnownScrollPosition = window.scrollY;
+    
+    if (!ticking) {
+      requestAnimationFrame(updateVideoTime);
+      ticking = true;
+    }
+  }
+
+  video.addEventListener('loadedmetadata', () => {
+    // Use passive listener for better performance
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // Initialize first frame
+    video.play();
+    video.pause();
+  });
+
+  // Optimize video loading
+  video.load();
+  video.preload = 'metadata'; // Changed from 'auto' for faster initial load
+  
+  video.play().catch(error => {
+    console.warn('Video autoplay prevented. User interaction may be required.', error);
+  });
+</script>
