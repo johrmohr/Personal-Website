@@ -76,7 +76,7 @@ img { max-width: 100%; display: block; height: auto; }
 
 .landing-header { text-align: center; margin-top: 180px; }
 .landing-title { font-size: 72px; font-weight: 800; letter-spacing: 1.5px; margin: 0; line-height: 1.1; }
-.landing-subrow { display: inline-flex; align-items: center; gap: 8px; margin-top: 36px; }
+.landing-subrow { display: inline-flex; align-items: center; gap: 8px; margin-top: 0; }
 .landing-subtitle { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; letter-spacing: 1.2px; opacity: 0.9; }
 .socials-icons { display: inline-flex; gap: 12px; position: relative; left: 12px; }
 .icon-link { color: var(--muted); display: inline-flex; align-items: center; }
@@ -193,6 +193,11 @@ img { max-width: 100%; display: block; height: auto; }
   text-rendering: optimizeSpeed;
 }
 
+.ascii-section {
+  padding: 48px 0;
+  text-align: center;
+}
+
 /* Safari-specific adjustment */
 @supports (-webkit-hyphens:none) {
   .landing-center {
@@ -209,7 +214,7 @@ img { max-width: 100%; display: block; height: auto; }
     margin-top: 120px;
   }
   .landing-subrow {
-    margin-top: 65px;
+    margin-top: 0;
   }
   .landing-spacer {
     height: 65px;
