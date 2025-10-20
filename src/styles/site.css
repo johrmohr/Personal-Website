@@ -47,7 +47,7 @@ img { max-width: 100%; display: block; height: auto; }
 .header-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   height: 64px;
 }
 
@@ -70,11 +70,10 @@ img { max-width: 100%; display: block; height: auto; }
 .header-socials .icon-link { color: var(--muted); }
 .header-socials .icon-link:hover { color: var(--primary-strong); }
 
-/* Desktop/laptop: space out header items properly */
+/* Desktop/laptop: keep header items centered */
 @media (min-width: 769px) {
   .nav { 
-    width: 100%; 
-    justify-content: space-between; 
+    justify-content: center; 
   }
 }
 
