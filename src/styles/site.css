@@ -41,7 +41,7 @@ a {
 .blackhole-link {
   display: block;
   text-decoration: none;
-  margin: 300px auto 0;
+  margin: 600px auto 0;
 }
 
 .ascii-blackhole {
@@ -80,7 +80,7 @@ a {
 }
 
 .bio-content {
-  margin-top: 250px;
+  margin-top: 80px;
   text-align: left;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
   font-size: 16px;
