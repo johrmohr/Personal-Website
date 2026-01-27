@@ -1,3 +1,6 @@
+
 welcome to my website :)
 
-built with astro + claude
+built by me 
+
+with astro, cursor, and claude
