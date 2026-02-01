@@ -1,8 +1,13 @@
 <footer class="site-footer">
-  <div class="container">
-    <a class="link small" href="#top">Back to top</a>
-    <div class="muted small">© <span id="year"></span> Jordan Moreno</div>
+  <a class="link small" href="#top">Back to top</a>
+  <div class="webring">
+    <a href="https://webring.lpnuci.com/?nav=prev&from=jordanmoreno.me">&larr;</a>
+    <a href="https://webring.lpnuci.com/">
+      <img src="/assets/lpn-webring-logo.png" height="24" alt="LPN Webring">
+    </a>
+    <a href="https://webring.lpnuci.com/?nav=next&from=jordanmoreno.me">&rarr;</a>
   </div>
+  <div class="muted small">© <span id="year"></span> Jordan Moreno</div>
   <script>
     document.getElementById('year').textContent = new Date().getFullYear().toString();
   </script>
