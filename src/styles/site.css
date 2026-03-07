@@ -144,6 +144,12 @@ a {
   text-decoration-color: var(--text);
 }
 
+@media (max-width: 1024px) {
+  .bio-content {
+    margin-top: clamp(220px, 30vw, 320px);
+  }
+}
+
 @media (max-width: 768px) {
   .ascii-blackhole {
     font-size: 3.5px;
@@ -153,7 +159,7 @@ a {
   }
   .bio-content {
     font-size: 14px;
-    margin-top: 24px;
+    margin-top: clamp(190px, 36vw, 260px);
   }
   .bio-columns {
     flex-direction: column;
@@ -600,7 +606,7 @@ a {
 /* Mobile responsive */
 @media (max-width: 768px) {
   .site-header {
-    padding: 18px 20px;
+    padding: 18px 16px;
     gap: 16px;
   }
 
@@ -621,11 +627,16 @@ a {
   }
 
   .brand {
-    font-size: 17px;
+    font-size: 15px;
+    letter-spacing: 0;
   }
 
   .brand--home {
-    margin-left: 22px;
+    margin-left: 8px;
+  }
+
+  .brand-intro-copy {
+    padding-right: 4px;
   }
 }
 

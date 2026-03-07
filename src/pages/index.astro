@@ -158,7 +158,8 @@ import VideoScrubber from '../components/VideoScrubber.astro';
         return;
       }
 
-      const progress = Math.max(0, Math.min(1, window.scrollY / 220));
+      const scrollStart = window.innerWidth <= 768 ? 28 : 0;
+      const progress = Math.max(0, Math.min(1, (window.scrollY - scrollStart) / 220));
       const collapsePoint = 0.58;
       const introProgress = Math.min(progress / collapsePoint, 1);
       const surnameProgress = progress <= collapsePoint
