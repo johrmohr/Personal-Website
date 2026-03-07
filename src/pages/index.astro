@@ -21,36 +21,23 @@ import VideoScrubber from '../components/VideoScrubber.astro';
 <body>
   <VideoScrubber />
 
-  <header class="site-header">
-    <a href="/" class="brand">jordan moreno</a>
-    <div class="header-icons">
-      <a href="https://github.com/johrmohr" target="_blank" rel="noopener" aria-label="GitHub" class="icon-link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2C6.48 2 2 6.58 2 12.26c0 4.52 2.87 8.35 6.84 9.7.5.09.68-.22.68-.48 0-.24-.01-.88-.01-1.73-2.78.61-3.37-1.2-3.37-1.2-.45-1.17-1.11-1.48-1.11-1.48-.91-.64.07-.63.07-.63 1 .07 1.53 1.05 1.53 1.05.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.36-2.22-.26-4.56-1.14-4.56-5.08 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.27 2.75 1.05.8-.23 1.65-.35 2.5-.35s1.7.12 2.5.35c1.91-1.32 2.75-1.05 2.75-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.95-2.34 4.81-4.57 5.06.36.32.67.94.67 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.58.69.48A10.05 10.05 0 0 0 22 12.26C22 6.58 17.52 2 12 2Z" fill="currentColor"/>
-        </svg>
-      </a>
-      <a href="https://www.linkedin.com/in/jordan-moreno-" target="_blank" rel="noopener" aria-label="LinkedIn" class="icon-link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6.94 7.5c0 .91-.73 1.65-1.64 1.65-.9 0-1.64-.74-1.64-1.65 0-.9.74-1.64 1.64-1.64.91 0 1.64.74 1.64 1.64ZM3.99 20.5h2.62V9.5H3.99v11Zm6.23-11h-2.6v11h2.6v-6.13c0-1.61.31-3.17 2.29-3.17 1.96 0 1.99 1.83 1.99 3.26v6.04h2.62v-6.83c0-3.37-.73-5.97-4.39-5.97-1.78 0-2.97.98-3.47 1.91h-.04v-1.61Z" fill="currentColor"/>
-        </svg>
-      </a>
-      <a href="https://x.com/johrmohr" target="_blank" rel="noopener" aria-label="X" class="icon-link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="currentColor"/>
-        </svg>
-      </a>
-      <a href="mailto:3moreno.jordan@gmail.com" aria-label="Email" class="icon-link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2" fill="none"/>
-          <polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2" fill="none"/>
-        </svg>
-      </a>
-    </div>
+  <header class="site-header site-header--home">
+    <a href="/" class="brand brand--home" aria-label="Jordan Moreno">
+      <span class="brand-home" aria-hidden="true">
+        <span class="brand-intro">
+          <span class="brand-intro-copy">hi, i'm</span>
+        </span>
+        <span class="brand-name">Jordan</span>
+        <span class="brand-surname">
+          <span class="brand-surname-copy">Moreno</span>
+        </span>
+        <span class="brand-measure brand-measure--surname">Moreno</span>
+      </span>
+    </a>
   </header>
 
   <!-- Hero section with ASCII black hole -->
   <section class="hero">
-    <p class="bio-greeting">hi, im jordan</p>
     <a href="/assets/resume.pdf" target="_blank" class="blackhole-link"><pre class="ascii-blackhole">
                                        @%%%%#####%%%%@
                                  @@%@%**+=--:..::--++*#%@@@
@@ -129,20 +116,96 @@ import VideoScrubber from '../components/VideoScrubber.astro';
   </div>
 
   <footer class="site-footer">
+    <div class="footer-icons" aria-label="Social links">
+      <a href="https://github.com/johrmohr" target="_blank" rel="noopener" aria-label="GitHub" class="icon-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C6.48 2 2 6.58 2 12.26c0 4.52 2.87 8.35 6.84 9.7.5.09.68-.22.68-.48 0-.24-.01-.88-.01-1.73-2.78.61-3.37-1.2-3.37-1.2-.45-1.17-1.11-1.48-1.11-1.48-.91-.64.07-.63.07-.63 1 .07 1.53 1.05 1.53 1.05.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.36-2.22-.26-4.56-1.14-4.56-5.08 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.27 2.75 1.05.8-.23 1.65-.35 2.5-.35s1.7.12 2.5.35c1.91-1.32 2.75-1.05 2.75-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.95-2.34 4.81-4.57 5.06.36.32.67.94.67 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.58.69.48A10.05 10.05 0 0 0 22 12.26C22 6.58 17.52 2 12 2Z" fill="currentColor"/>
+        </svg>
+      </a>
+      <a href="https://www.linkedin.com/in/jordan-moreno-" target="_blank" rel="noopener" aria-label="LinkedIn" class="icon-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6.94 7.5c0 .91-.73 1.65-1.64 1.65-.9 0-1.64-.74-1.64-1.65 0-.9.74-1.64 1.64-1.64.91 0 1.64.74 1.64 1.64ZM3.99 20.5h2.62V9.5H3.99v11Zm6.23-11h-2.6v11h2.6v-6.13c0-1.61.31-3.17 2.29-3.17 1.96 0 1.99 1.83 1.99 3.26v6.04h2.62v-6.83c0-3.37-.73-5.97-4.39-5.97-1.78 0-2.97.98-3.47 1.91h-.04v-1.61Z" fill="currentColor"/>
+        </svg>
+      </a>
+      <a href="https://x.com/johrmohr" target="_blank" rel="noopener" aria-label="X" class="icon-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="currentColor"/>
+        </svg>
+      </a>
+      <a href="mailto:3moreno.jordan@gmail.com" aria-label="Email" class="icon-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2" fill="none"/>
+          <polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2" fill="none"/>
+        </svg>
+      </a>
+    </div>
     <span>&copy; <span id="year"></span> Jordan Moreno</span>
   </footer>
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear().toString();
+    const brand = document.querySelector('.brand--home');
+    const introCopy = brand?.querySelector('.brand-intro-copy');
+    const name = brand?.querySelector('.brand-name');
+    const surnameMeasure = brand?.querySelector('.brand-measure--surname');
+    let introWidth = 0;
+    let nameWidth = 0;
+    let surnameWidth = 0;
+    let ticking = false;
 
-    const header = document.querySelector('.site-header');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 100) {
-        header.classList.add('visible');
-      } else {
-        header.classList.remove('visible');
+    const updateBrand = () => {
+      if (!brand) {
+        return;
       }
-    });
+
+      const progress = Math.max(0, Math.min(1, window.scrollY / 220));
+      const collapsePoint = 0.58;
+      const introProgress = Math.min(progress / collapsePoint, 1);
+      const surnameProgress = progress <= collapsePoint
+        ? 0
+        : Math.min((progress - collapsePoint) / (1 - collapsePoint), 1);
+      const currentIntroWidth = introWidth * (1 - introProgress);
+      const introOpacity = 1 - introProgress;
+      const introOffset = -Math.min(24, introWidth * 0.18) * introProgress;
+      const currentSurnameWidth = surnameWidth * surnameProgress;
+      const surnameOpacity = surnameProgress;
+      const surnameShift = (1 - surnameProgress) * Math.min(24, surnameWidth * 0.18);
+      const surnameGap = 6 * surnameProgress;
+      const width = nameWidth + currentIntroWidth + surnameGap + currentSurnameWidth;
+
+      brand.style.setProperty('--brand-progress', progress.toFixed(3));
+      brand.style.setProperty('--brand-intro-width', `${currentIntroWidth}px`);
+      brand.style.setProperty('--brand-intro-opacity', `${introOpacity.toFixed(3)}`);
+      brand.style.setProperty('--brand-intro-offset', `${introOffset.toFixed(2)}px`);
+      brand.style.setProperty('--brand-surname-width', `${currentSurnameWidth}px`);
+      brand.style.setProperty('--brand-surname-opacity', `${surnameOpacity.toFixed(3)}`);
+      brand.style.setProperty('--brand-surname-shift', `${surnameShift.toFixed(2)}px`);
+      brand.style.setProperty('--brand-surname-gap', `${surnameGap.toFixed(2)}px`);
+      brand.style.setProperty('--brand-width', `${width}px`);
+      ticking = false;
+    };
+
+    const measureBrand = () => {
+      if (!brand || !introCopy || !name || !surnameMeasure) {
+        return;
+      }
+
+      introWidth = introCopy.getBoundingClientRect().width;
+      nameWidth = name.getBoundingClientRect().width;
+      surnameWidth = surnameMeasure.getBoundingClientRect().width;
+      updateBrand();
+    };
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateBrand);
+        ticking = true;
+      }
+    }, { passive: true });
+    window.addEventListener('resize', measureBrand);
+    window.addEventListener('load', measureBrand);
+    document.fonts?.ready?.then(measureBrand);
+    measureBrand();
   </script>
 </body>
 </html>

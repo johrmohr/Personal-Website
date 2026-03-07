@@ -68,17 +68,6 @@ a {
   opacity: 1;
 }
 
-/* Hero bio layout */
-.bio-greeting {
-  position: absolute;
-  top: 120px;
-  left: 28%;
-  font-size: 16px;
-  font-weight: 400;
-  color: var(--text);
-  margin: 0;
-}
-
 .bio-content {
   margin-top: 540px;
   text-align: left;
@@ -162,13 +151,6 @@ a {
   .hero {
     padding: 100px 16px 40px;
   }
-  .bio-greeting {
-    position: relative;
-    top: 0;
-    left: 0;
-    font-size: 14px;
-    margin-bottom: 24px;
-  }
   .bio-content {
     font-size: 14px;
     margin-top: 24px;
@@ -190,39 +172,109 @@ a {
   align-items: center;
   padding: 20px 48px;
   z-index: 100;
-  background: #0a0a0a;
-  border-bottom: 1px solid #1a1a1a;
-  transform: translateY(-100%);
-  transition: transform 0.3s ease;
+  background: #000;
 }
 
-.header-icons {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.header-icons .icon-link {
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  transition: color 0.2s;
-}
-
-.header-icons .icon-link:hover {
-  color: var(--text);
-}
-
-.site-header.visible {
-  transform: translateY(0);
+.site-header--home {
+  justify-content: flex-start;
 }
 
 .brand {
+  display: flex;
+  align-items: center;
   font-weight: 700;
   font-size: 18px;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  text-decoration-color: var(--link-underline);
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.brand--static {
+  line-height: 1;
+}
+
+.brand--home {
+  --brand-width: max-content;
+  --brand-intro-width: auto;
+  --brand-intro-opacity: 1;
+  --brand-intro-offset: 0px;
+  --brand-surname-width: 0px;
+  --brand-surname-opacity: 0;
+  --brand-surname-shift: 14px;
+  --brand-surname-gap: 0px;
+  position: relative;
+  width: var(--brand-width);
+  margin-left: 40px;
+  overflow: hidden;
+  will-change: width;
+}
+
+.brand-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  line-height: 1;
+  padding: 2px 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.brand-intro {
+  display: block;
+  width: var(--brand-intro-width);
+  overflow: hidden;
+  opacity: var(--brand-intro-opacity);
+  transform: translateX(var(--brand-intro-offset));
+  transform-origin: left center;
+  white-space: nowrap;
+  will-change: width, opacity, transform;
+}
+
+.brand-intro-copy {
+  display: block;
+  padding-right: 6px;
+  font: inherit;
+  letter-spacing: inherit;
+  white-space: nowrap;
+}
+
+.brand-name {
+  display: block;
+  font: inherit;
+  letter-spacing: inherit;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.brand-surname {
+  display: block;
+  width: var(--brand-surname-width);
+  margin-left: var(--brand-surname-gap);
+  overflow: hidden;
+  white-space: nowrap;
+  will-change: width, margin-left;
+}
+
+.brand-surname-copy {
+  display: inline-block;
+  font: inherit;
+  letter-spacing: inherit;
+  opacity: var(--brand-surname-opacity);
+  transform: translateX(var(--brand-surname-shift));
+  transform-origin: left center;
+  white-space: nowrap;
+  will-change: opacity, transform;
+}
+
+.brand-measure {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
 }
 
 .nav {
@@ -486,8 +538,10 @@ a {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
+  gap: 18px 28px;
+  flex-wrap: wrap;
   color: var(--text-muted);
   font-size: 14px;
 }
@@ -506,6 +560,15 @@ a {
 }
 
 .footer-icons .icon-link:hover {
+  color: var(--text);
+}
+
+.footer-link {
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.footer-link:hover {
   color: var(--text);
 }
 
@@ -537,13 +600,14 @@ a {
 /* Mobile responsive */
 @media (max-width: 768px) {
   .site-header {
-    padding: 20px 24px;
-    flex-direction: column;
+    padding: 18px 20px;
     gap: 16px;
   }
 
   .nav {
-    gap: 20px;
+    gap: 18px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 
   .main-content {
@@ -552,9 +616,16 @@ a {
 
   .site-footer {
     padding: 20px 24px;
-    flex-direction: column;
-    gap: 12px;
+    justify-content: center;
     text-align: center;
+  }
+
+  .brand {
+    font-size: 17px;
+  }
+
+  .brand--home {
+    margin-left: 22px;
   }
 }
 

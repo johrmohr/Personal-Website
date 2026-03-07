@@ -1,74 +1,353 @@
-<div class="video-container">
-  <video id="background-video" preload="auto" muted playsinline webkit-playsinline>
-    <source src="/BlackHole_hq.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
+<div class="video-container" aria-hidden="true">
+  <canvas id="ascii-canvas"></canvas>
 </div>
 
 <style>
   .video-container {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
+    inset: 0;
     overflow: hidden;
     z-index: -1;
+    background: #000;
   }
 
-  #background-video {
+  #ascii-canvas {
+    display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    transform: scale(1.05);
   }
 </style>
 
 <script>
-  const video = document.getElementById('background-video') as HTMLVideoElement;
-  let ticking = false;
-  let lastKnownScrollPosition = 0;
+  const canvas = document.getElementById('ascii-canvas') as HTMLCanvasElement | null;
 
-  function updateVideoTime() {
-    const scrollY = lastKnownScrollPosition;
-    const totalScrollHeight = document.body.scrollHeight - window.innerHeight;
+  if (canvas) {
+    const context = canvas.getContext('2d');
+    const gridCanvas = document.createElement('canvas');
+    const gridContext = gridCanvas.getContext('2d');
 
-    if (totalScrollHeight > 0) {
-      const scrollProgress = scrollY / totalScrollHeight;
-      const targetTime = scrollProgress * video.duration;
-      
-      // Only update if the time difference is significant enough to avoid micro-updates
-      if (Math.abs(video.currentTime - targetTime) > 0.01) {
-        video.currentTime = targetTime;
+    if (!context || !gridContext) {
+      throw new Error('Canvas rendering is unavailable.');
+    }
+
+    const FRAME_WIDTH = 128;
+    const FRAME_HEIGHT = 72;
+    const FRAME_SIZE = FRAME_WIDTH * FRAME_HEIGHT;
+    const SOURCE_ASPECT = FRAME_WIDTH / FRAME_HEIGHT;
+    const POINTER_EASING = 18;
+    const CANVAS_DPR = 1.25;
+    const DOT_SCALE = 0.2;
+    const MIN_DOT_RADIUS = 0.06;
+    const SPRITE_LEVELS = 20;
+    const BACKGROUND_DOT_SCALE = 0.035;
+    const BACKGROUND_DOT_ALPHA = 0.12;
+    const POINTER_GROWTH_LEVELS = 4;
+    const DESKTOP_ZOOM = 1.08;
+    const MOBILE_ZOOM = 1.16;
+
+    const state = {
+      width: window.innerWidth,
+      height: window.innerHeight,
+      dpr: Math.min(window.devicePixelRatio || 1, CANVAS_DPR),
+      targetFrame: 0,
+      renderedFrame: 0,
+      frameCount: 0,
+      frameData: null as Uint8Array | null,
+      lastSampledFrame: -1,
+      dotLevels: new Uint8Array(FRAME_SIZE),
+      originXs: new Float32Array(FRAME_SIZE),
+      originYs: new Float32Array(FRAME_SIZE),
+      sprites: [] as Array<{ canvas: HTMLCanvasElement; radius: number; size: number }>,
+      rafId: 0,
+      lastTimestamp: 0,
+      pointerX: window.innerWidth * 0.5,
+      pointerY: window.innerHeight * 0.5,
+      pointerTargetX: window.innerWidth * 0.5,
+      pointerTargetY: window.innerHeight * 0.5,
+      isReady: false,
+    };
+
+    const clamp = (value: number, min: number, max: number) => {
+      return Math.min(Math.max(value, min), max);
+    };
+
+    const createDotSprite = (radius: number, alpha: number) => {
+      const size = Math.max(2, Math.ceil(radius * 2 + 4));
+      const sprite = document.createElement('canvas');
+      sprite.width = size;
+      sprite.height = size;
+
+      const spriteContext = sprite.getContext('2d');
+      if (!spriteContext) {
+        return { canvas: sprite, radius, size };
       }
-    }
-    
-    ticking = false;
+
+      spriteContext.fillStyle = '#fff';
+      spriteContext.globalAlpha = alpha;
+      spriteContext.beginPath();
+      spriteContext.arc(size * 0.5, size * 0.5, radius, 0, Math.PI * 2);
+      spriteContext.fill();
+
+      return { canvas: sprite, radius, size };
+    };
+
+    const rebuildDotSprites = (baseRadius: number) => {
+      const sprites = [];
+
+      for (let index = 0; index < SPRITE_LEVELS; index += 1) {
+        const normalized = index / (SPRITE_LEVELS - 1);
+        const radius = MIN_DOT_RADIUS + normalized * baseRadius;
+        const alpha = 0.04 + normalized * 0.96;
+        sprites.push(createDotSprite(radius, alpha));
+      }
+
+      state.sprites = sprites;
+    };
+
+    const rebuildStaticGrid = () => {
+      gridCanvas.width = Math.round(state.width * state.dpr);
+      gridCanvas.height = Math.round(state.height * state.dpr);
+      gridContext.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+      gridContext.clearRect(0, 0, state.width, state.height);
+
+      const cellWidth = state.width / FRAME_WIDTH;
+      const cellHeight = state.height / FRAME_HEIGHT;
+      const backgroundRadius = Math.max(
+        0.12,
+        Math.min(cellWidth, cellHeight) * BACKGROUND_DOT_SCALE
+      );
+      const sprite = createDotSprite(backgroundRadius, BACKGROUND_DOT_ALPHA);
+
+      for (let index = 0; index < FRAME_SIZE; index += 1) {
+        gridContext.drawImage(
+          sprite.canvas,
+          state.originXs[index] - sprite.radius,
+          state.originYs[index] - sprite.radius,
+          sprite.size,
+          sprite.size
+        );
+      }
+    };
+
+    const resizeRenderer = () => {
+      state.width = window.innerWidth;
+      state.height = window.innerHeight;
+      state.dpr = Math.min(window.devicePixelRatio || 1, CANVAS_DPR);
+
+      canvas.width = Math.round(state.width * state.dpr);
+      canvas.height = Math.round(state.height * state.dpr);
+      context.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+
+      const viewportAspect = state.width / state.height;
+      let contentWidth = state.width;
+      let contentHeight = state.height;
+
+      if (viewportAspect > SOURCE_ASPECT) {
+        contentWidth = state.width;
+        contentHeight = contentWidth / SOURCE_ASPECT;
+      } else {
+        contentHeight = state.height;
+        contentWidth = contentHeight * SOURCE_ASPECT;
+      }
+
+      const zoom = state.width < 700 ? MOBILE_ZOOM : DESKTOP_ZOOM;
+      contentWidth *= zoom;
+      contentHeight *= zoom;
+
+      const offsetX = (state.width - contentWidth) * 0.5;
+      const offsetY = (state.height - contentHeight) * 0.5;
+      const cellWidth = contentWidth / FRAME_WIDTH;
+      const cellHeight = contentHeight / FRAME_HEIGHT;
+
+      for (let row = 0; row < FRAME_HEIGHT; row += 1) {
+        for (let column = 0; column < FRAME_WIDTH; column += 1) {
+          const index = row * FRAME_WIDTH + column;
+          state.originXs[index] = offsetX + column * cellWidth + cellWidth * 0.5;
+          state.originYs[index] = offsetY + row * cellHeight + cellHeight * 0.5;
+        }
+      }
+
+      rebuildDotSprites(Math.min(cellWidth, cellHeight) * DOT_SCALE);
+      rebuildStaticGrid();
+    };
+
+    const getScrollTarget = () => {
+      const totalScrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+
+      if (totalScrollHeight <= 0 || state.frameCount <= 1) {
+        return 0;
+      }
+
+      const progress = clamp(window.scrollY / totalScrollHeight, 0, 1);
+      return progress * (state.frameCount - 1);
+    };
+
+    const updateDotLevels = () => {
+      if (!state.frameData || state.frameCount === 0) {
+        return;
+      }
+
+      if (Math.abs(state.renderedFrame - state.lastSampledFrame) < 0.0001) {
+        return;
+      }
+
+      const framePosition = clamp(state.renderedFrame, 0, state.frameCount - 1);
+      const lowerFrame = Math.floor(framePosition);
+      const upperFrame = Math.min(state.frameCount - 1, lowerFrame + 1);
+      const mix = framePosition - lowerFrame;
+      const lowerOffset = lowerFrame * FRAME_SIZE;
+      const upperOffset = upperFrame * FRAME_SIZE;
+
+      for (let index = 0; index < FRAME_SIZE; index += 1) {
+        const low = state.frameData[lowerOffset + index] ?? 0;
+        const high = state.frameData[upperOffset + index] ?? low;
+        const luma = low + (high - low) * mix;
+        const brightness = clamp((luma / 255 - 0.06) * 1.2, 0, 1);
+        const shapedBrightness = Math.pow(brightness, 0.9);
+        state.dotLevels[index] = Math.round(shapedBrightness * (SPRITE_LEVELS - 1));
+      }
+
+      state.lastSampledFrame = framePosition;
+    };
+
+    const drawDots = () => {
+      const interactionRadius = Math.min(state.width, state.height) * 0.2;
+      const maxOffset = Math.min(state.width / FRAME_WIDTH, state.height / FRAME_HEIGHT) * 2;
+
+      context.clearRect(0, 0, state.width, state.height);
+      context.fillStyle = '#000';
+      context.fillRect(0, 0, state.width, state.height);
+      context.drawImage(gridCanvas, 0, 0, state.width, state.height);
+
+      for (let index = 0; index < FRAME_SIZE; index += 1) {
+        const baseLevel = state.dotLevels[index];
+        if (baseLevel <= 1) {
+          continue;
+        }
+
+        const originX = state.originXs[index];
+        const originY = state.originYs[index];
+        const dx = originX - state.pointerX;
+        const dy = originY - state.pointerY;
+        const distance = Math.hypot(dx, dy);
+        const influence = distance < interactionRadius
+          ? (1 - distance / interactionRadius) ** 2
+          : 0;
+        const directionX = distance > 0 ? dx / distance : 0;
+        const directionY = distance > 0 ? dy / distance : 0;
+        const offsetX = directionX * influence * maxOffset;
+        const offsetY = directionY * influence * maxOffset;
+        const spriteLevel = Math.min(
+          SPRITE_LEVELS - 1,
+          baseLevel + Math.round(influence * POINTER_GROWTH_LEVELS)
+        );
+        const sprite = state.sprites[spriteLevel];
+
+        context.drawImage(
+          sprite.canvas,
+          originX + offsetX - sprite.radius,
+          originY + offsetY - sprite.radius,
+          sprite.size,
+          sprite.size
+        );
+      }
+    };
+
+    const renderFrame = (timestamp: number) => {
+      if (state.lastTimestamp === 0) {
+        state.lastTimestamp = timestamp;
+      }
+
+      const dt = Math.min((timestamp - state.lastTimestamp) / 1000, 0.05);
+      state.lastTimestamp = timestamp;
+
+      const pointerAlpha = 1 - Math.exp(-POINTER_EASING * dt);
+      state.pointerX += (state.pointerTargetX - state.pointerX) * pointerAlpha;
+      state.pointerY += (state.pointerTargetY - state.pointerY) * pointerAlpha;
+
+      if (state.renderedFrame !== state.targetFrame) {
+        state.renderedFrame = state.targetFrame;
+        updateDotLevels();
+      }
+
+      drawDots();
+
+      const pointerMoving = Math.abs(state.pointerTargetX - state.pointerX) > 0.2
+        || Math.abs(state.pointerTargetY - state.pointerY) > 0.2;
+
+      if (pointerMoving) {
+        state.rafId = window.requestAnimationFrame(renderFrame);
+        return;
+      }
+
+      state.rafId = 0;
+      state.lastTimestamp = 0;
+    };
+
+    const requestRender = () => {
+      if (!state.isReady || state.rafId !== 0) {
+        return;
+      }
+
+      state.rafId = window.requestAnimationFrame(renderFrame);
+    };
+
+    const updateScrollTarget = () => {
+      const nextTarget = getScrollTarget();
+
+      if (Math.abs(nextTarget - state.targetFrame) < 0.0001) {
+        return;
+      }
+
+      state.targetFrame = nextTarget;
+      requestRender();
+    };
+
+    const updatePointerTarget = (event: PointerEvent) => {
+      state.pointerTargetX = event.clientX;
+      state.pointerTargetY = event.clientY;
+      requestRender();
+    };
+
+    const initialize = () => {
+      resizeRenderer();
+      state.targetFrame = getScrollTarget();
+      state.renderedFrame = state.targetFrame;
+      state.lastSampledFrame = -1;
+      updateDotLevels();
+      state.isReady = true;
+
+      window.addEventListener('scroll', updateScrollTarget, { passive: true });
+      window.addEventListener('resize', () => {
+        resizeRenderer();
+        state.lastSampledFrame = -1;
+        requestRender();
+      }, { passive: true });
+      window.addEventListener('pointermove', updatePointerTarget, { passive: true });
+      document.documentElement.addEventListener('pointerleave', () => {
+        state.pointerTargetX = state.width * 0.5;
+        state.pointerTargetY = state.height * 0.5;
+        requestRender();
+      });
+
+      requestRender();
+    };
+
+    fetch('/BlackHole_ascii_128x72.gray')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to load ascii frames: ${response.status}`);
+        }
+
+        return response.arrayBuffer();
+      })
+      .then((buffer) => {
+        state.frameData = new Uint8Array(buffer);
+        state.frameCount = Math.max(1, Math.floor(state.frameData.length / FRAME_SIZE));
+        initialize();
+      })
+      .catch((error) => {
+        console.error('Unable to load ascii frame buffer.', error);
+      });
   }
-
-  function onScroll() {
-    lastKnownScrollPosition = window.scrollY;
-    
-    if (!ticking) {
-      requestAnimationFrame(updateVideoTime);
-      ticking = true;
-    }
-  }
-
-  video.addEventListener('loadedmetadata', () => {
-    // Use passive listener for better performance
-    window.addEventListener('scroll', onScroll, { passive: true });
-
-    // Initialize first frame
-    video.play();
-    video.pause();
-  });
-
-  // Optimize video loading
-  video.load();
-  video.preload = 'metadata'; // Changed from 'auto' for faster initial load
-  
-  video.play().catch(error => {
-    console.warn('Video autoplay prevented. User interaction may be required.', error);
-  });
 </script>
