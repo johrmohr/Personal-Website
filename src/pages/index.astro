@@ -1,6 +1,39 @@
 ---
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import '../styles/site.css';
 import VideoScrubber from '../components/VideoScrubber.astro';
+
+const currentFile = fileURLToPath(import.meta.url);
+const currentDir = path.dirname(currentFile);
+const assetsDir = path.resolve(currentDir, '../../public/assets');
+const heroStackPattern = /^hero-stack-(\d+)\.(avif|jpe?g|png|webp)$/i;
+
+const heroStackImages = fs
+  .readdirSync(assetsDir)
+  .map((file) => {
+    const match = file.match(heroStackPattern);
+
+    if (!match) {
+      return null;
+    }
+
+    return {
+      file,
+      order: Number(match[1]),
+      src: `/assets/${file}`,
+      alt: `Hero photo ${Number(match[1])}`
+    };
+  })
+  .filter((image) => image !== null)
+  .sort((left, right) => left.order - right.order);
+
+const heroStackCaptions = [
+  'Ibaraki, JP 2024',
+  'Newport, CA 2025',
+  'Irvine, CA 2026'
+];
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -22,22 +55,44 @@ import VideoScrubber from '../components/VideoScrubber.astro';
   <VideoScrubber />
 
   <header class="site-header site-header--home">
-    <a href="/" class="brand brand--home" aria-label="Jordan Moreno">
-      <span class="brand-home" aria-hidden="true">
-        <span class="brand-intro">
-          <span class="brand-intro-copy">hi, i'm</span>
-        </span>
-        <span class="brand-name">Jordan</span>
-        <span class="brand-surname">
-          <span class="brand-surname-copy">Moreno</span>
-        </span>
-        <span class="brand-measure brand-measure--surname">Moreno</span>
-      </span>
-    </a>
+    <div class="site-header-leading">
+      <a href="/" class="brand brand--home" aria-label="Jordan Moreno" data-brand-state="expanded" data-brand-ready="false">
+        <span class="brand-home" aria-hidden="true"><span class="brand-intro"><span class="brand-intro-copy">hi, i'm</span></span><span class="brand-name">Jordan</span><span class="brand-surname"><span class="brand-surname-copy">Moreno</span></span><span class="brand-measure brand-measure--surname">Moreno</span></span>
+      </a>
+    </div>
+    <div class="site-header-trailing">
+      <a href="/news2me" class="header-link">News2me</a>
+      <a href="/blog" class="header-link">Blog</a>
+    </div>
   </header>
 
   <!-- Hero section with ASCII black hole -->
   <section class="hero">
+    {heroStackImages.length > 0 && (
+      <div class="hero-photo-stack" aria-label="Photo stack" data-photo-stack>
+        {heroStackImages.map((image, index) => (
+          <button
+            type="button"
+            class="hero-photo-card"
+            data-stack-card
+            data-stack-index={index}
+            data-stack-caption={heroStackCaptions[index] ?? ''}
+            aria-label={`Show details for photo ${index + 1}`}
+          >
+            <span class="hero-photo-card-caption" aria-hidden="true">{heroStackCaptions[index] ?? ''}</span>
+            <span class="hero-photo-card-frame">
+              <img
+                src={image.src}
+                alt={image.alt}
+                class="hero-photo-image"
+                loading={index === 0 ? 'eager' : 'lazy'}
+                decoding="async"
+              />
+            </span>
+          </button>
+        ))}
+      </div>
+    )}
     <a href="/assets/resume.pdf" target="_blank" class="blackhole-link"><pre class="ascii-blackhole">
                                        @%%%%#####%%%%@
                                  @@%@%**+=--:..::--++*#%@@@
@@ -116,6 +171,7 @@ import VideoScrubber from '../components/VideoScrubber.astro';
   </div>
 
   <footer class="site-footer">
+    <span class="footer-copy">&copy; <span id="year"></span></span>
     <div class="footer-icons" aria-label="Social links">
       <a href="https://github.com/johrmohr" target="_blank" rel="noopener" aria-label="GitHub" class="icon-link">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -139,73 +195,321 @@ import VideoScrubber from '../components/VideoScrubber.astro';
         </svg>
       </a>
     </div>
-    <span>&copy; <span id="year"></span> Jordan Moreno</span>
   </footer>
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear().toString();
     const brand = document.querySelector('.brand--home');
     const introCopy = brand?.querySelector('.brand-intro-copy');
-    const name = brand?.querySelector('.brand-name');
     const surnameMeasure = brand?.querySelector('.brand-measure--surname');
+    const hero = document.querySelector('.hero');
+    const photoStack = document.querySelector('[data-photo-stack]');
+    const stackCards = photoStack ? Array.from(photoStack.querySelectorAll('[data-stack-card]')) : [];
+    const blackholeLink = document.querySelector('.blackhole-link');
+    const MOBILE_BREAKPOINT = 768;
+    const TOP_RESET_THRESHOLD = 2;
+    const COLLAPSE_SCROLL_THRESHOLD = 12;
+    const MOBILE_IDLE_SCROLL_LIMIT = 72;
     let introWidth = 0;
-    let nameWidth = 0;
     let surnameWidth = 0;
     let ticking = false;
+    let userHasScrolled = false;
+    const stackAnchorIndex = 0;
+    let hoveredStackIndex = -1;
+    let selectedStackIndex = -1;
+    let stackSuckDeltaX = 0;
+    let stackSuckDeltaY = 0;
+    let stackSuckDistance = 1;
+
+    const getScrollY = () => Math.max(
+      window.scrollY,
+      document.documentElement.scrollTop,
+      document.body.scrollTop,
+      0
+    );
+
+    const isMobileViewport = () => window.innerWidth <= MOBILE_BREAKPOINT;
+
+    const setBrandState = (nextState) => {
+      if (brand?.dataset.brandState !== nextState) {
+        brand.dataset.brandState = nextState;
+      }
+    };
 
     const updateBrand = () => {
       if (!brand) {
         return;
       }
 
-      const scrollStart = window.innerWidth <= 768 ? 28 : 0;
-      const progress = Math.max(0, Math.min(1, (window.scrollY - scrollStart) / 220));
-      const collapsePoint = 0.58;
-      const introProgress = Math.min(progress / collapsePoint, 1);
-      const surnameProgress = progress <= collapsePoint
-        ? 0
-        : Math.min((progress - collapsePoint) / (1 - collapsePoint), 1);
-      const currentIntroWidth = introWidth * (1 - introProgress);
-      const introOpacity = 1 - introProgress;
-      const introOffset = -Math.min(24, introWidth * 0.18) * introProgress;
-      const currentSurnameWidth = surnameWidth * surnameProgress;
-      const surnameOpacity = surnameProgress;
-      const surnameShift = (1 - surnameProgress) * Math.min(24, surnameWidth * 0.18);
-      const surnameGap = 6 * surnameProgress;
-      const width = nameWidth + currentIntroWidth + surnameGap + currentSurnameWidth;
+      const currentScrollY = getScrollY();
 
-      brand.style.setProperty('--brand-progress', progress.toFixed(3));
-      brand.style.setProperty('--brand-intro-width', `${currentIntroWidth}px`);
-      brand.style.setProperty('--brand-intro-opacity', `${introOpacity.toFixed(3)}`);
-      brand.style.setProperty('--brand-intro-offset', `${introOffset.toFixed(2)}px`);
-      brand.style.setProperty('--brand-surname-width', `${currentSurnameWidth}px`);
-      brand.style.setProperty('--brand-surname-opacity', `${surnameOpacity.toFixed(3)}`);
-      brand.style.setProperty('--brand-surname-shift', `${surnameShift.toFixed(2)}px`);
-      brand.style.setProperty('--brand-surname-gap', `${surnameGap.toFixed(2)}px`);
-      brand.style.setProperty('--brand-width', `${width}px`);
+      if (currentScrollY <= TOP_RESET_THRESHOLD) {
+        setBrandState('expanded');
+        ticking = false;
+        return;
+      }
+
+      if (isMobileViewport() && !userHasScrolled && currentScrollY <= MOBILE_IDLE_SCROLL_LIMIT) {
+        setBrandState('expanded');
+        ticking = false;
+        return;
+      }
+
+      setBrandState(currentScrollY > COLLAPSE_SCROLL_THRESHOLD ? 'collapsed' : 'expanded');
       ticking = false;
     };
 
     const measureBrand = () => {
-      if (!brand || !introCopy || !name || !surnameMeasure) {
+      if (!brand || !introCopy || !surnameMeasure) {
         return;
       }
 
       introWidth = introCopy.getBoundingClientRect().width;
-      nameWidth = name.getBoundingClientRect().width;
       surnameWidth = surnameMeasure.getBoundingClientRect().width;
+      brand.style.setProperty('--brand-intro-full-width', `${introWidth}px`);
+      brand.style.setProperty('--brand-surname-full-width', `${surnameWidth}px`);
       updateBrand();
+      if (brand.dataset.brandReady !== 'true') {
+        window.requestAnimationFrame(() => {
+          brand.dataset.brandReady = 'true';
+        });
+      }
     };
 
-    window.addEventListener('scroll', () => {
+    const scheduleBrandUpdate = () => {
       if (!ticking) {
         window.requestAnimationFrame(updateBrand);
         ticking = true;
       }
+    };
+
+    const markUserScrollIntent = () => {
+      userHasScrolled = true;
+    };
+
+    const handleViewportChange = () => {
+      measureBrand();
+      applyPhotoStackLayout();
+      measurePhotoStackSuction();
+    };
+
+    const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+    const setPhotoStackScrollState = (progress) => {
+      if (!photoStack) {
+        return;
+      }
+
+      const eased = 1 - Math.pow(1 - progress, 2.1);
+      const scale = 1 - (0.86 * eased);
+      const opacity = progress >= 0.96 ? 0 : Math.max(0, 1 - (0.96 * eased));
+      const blur = 3.2 * eased;
+
+      photoStack.style.setProperty('--stack-scroll-x', `${stackSuckDeltaX * eased}px`);
+      photoStack.style.setProperty('--stack-scroll-y', `${stackSuckDeltaY * eased}px`);
+      photoStack.style.setProperty('--stack-scroll-scale', `${scale}`);
+      photoStack.style.setProperty('--stack-scroll-opacity', `${opacity}`);
+      photoStack.style.setProperty('--stack-scroll-blur', `${blur}px`);
+      photoStack.style.pointerEvents = progress >= 0.98 ? 'none' : '';
+    };
+
+    const updatePhotoStackSuction = () => {
+      if (!photoStack || !hero) {
+        return;
+      }
+
+      const heroTop = hero.getBoundingClientRect().top + window.scrollY;
+      const scrollWithinHero = Math.max(0, window.scrollY - heroTop);
+      const progress = clamp(scrollWithinHero / stackSuckDistance, 0, 1);
+
+      setPhotoStackScrollState(progress);
+    };
+
+    const measurePhotoStackSuction = () => {
+      if (!photoStack || !hero || !blackholeLink) {
+        return;
+      }
+
+      setPhotoStackScrollState(0);
+
+      const heroRect = hero.getBoundingClientRect();
+      const stackRect = photoStack.getBoundingClientRect();
+      const blackholeRect = blackholeLink.getBoundingClientRect();
+      const stackCenterX = stackRect.left + (stackRect.width / 2) - heroRect.left;
+      const stackCenterY = stackRect.top + (stackRect.height / 2) - heroRect.top;
+      const blackholeCenterX = blackholeRect.left + (blackholeRect.width / 2) - heroRect.left;
+      const blackholeCenterY = blackholeRect.top + (blackholeRect.height / 2) - heroRect.top;
+      const stackBottom = stackRect.bottom - heroRect.top;
+      const blackholeTop = blackholeRect.top - heroRect.top;
+
+      stackSuckDeltaX = blackholeCenterX - stackCenterX;
+      stackSuckDeltaY = blackholeCenterY - stackCenterY;
+      stackSuckDistance = Math.max(220, blackholeTop - stackBottom);
+
+      updatePhotoStackSuction();
+    };
+
+    const normalizeStackIndex = (value) => {
+      if (!stackCards.length) {
+        return 0;
+      }
+
+      return ((value % stackCards.length) + stackCards.length) % stackCards.length;
+    };
+
+    const getStackOffset = (cardIndex, anchorIndex) => {
+      const forwardDistance = normalizeStackIndex(cardIndex - anchorIndex);
+
+      if (forwardDistance === 0) {
+        return 0;
+      }
+
+      if (forwardDistance <= stackCards.length / 2) {
+        return forwardDistance;
+      }
+
+      return forwardDistance - stackCards.length;
+    };
+
+    const applyPhotoStackLayout = () => {
+      if (!photoStack || !stackCards.length) {
+        return;
+      }
+
+      const compactMultiplier = window.innerWidth <= MOBILE_BREAKPOINT ? 0.72 : window.innerWidth <= 1024 ? 0.86 : 1;
+      const baseOffsets = stackCards.map((_, index) => getStackOffset(index, stackAnchorIndex));
+      const hoveredOffset = hoveredStackIndex !== -1 ? baseOffsets[hoveredStackIndex] : null;
+
+      stackCards.forEach((card, index) => {
+        const offset = baseOffsets[index];
+        const direction = offset === 0 ? 0 : Math.sign(offset);
+        const distance = Math.abs(offset);
+        let translateX = 0;
+        let translateY = -4;
+        let rotate = 0;
+        let scale = 1;
+        let opacity = 1;
+        let brightness = 1;
+        let saturate = 1;
+        let zIndex = 30;
+        let shadow = '0 28px 80px rgba(0, 0, 0, 0.38)';
+
+        if (distance === 1) {
+          translateX = direction * (108 * compactMultiplier);
+          translateY = 14 * compactMultiplier;
+          rotate = direction * 11;
+          scale = 0.88;
+          opacity = 0.92;
+          brightness = 0.86;
+          saturate = 0.92;
+          zIndex = 20;
+          shadow = '0 18px 48px rgba(0, 0, 0, 0.24)';
+        } else if (distance >= 2) {
+          const distanceBoost = distance - 2;
+          translateX = direction * ((186 + distanceBoost * 44) * compactMultiplier);
+          translateY = (30 + distanceBoost * 12) * compactMultiplier;
+          rotate = direction * (17 + distanceBoost * 2);
+          scale = Math.max(0.58, 0.72 - distanceBoost * 0.06);
+          opacity = Math.max(0.28, 0.58 - distanceBoost * 0.08);
+          brightness = Math.max(0.52, 0.66 - distanceBoost * 0.05);
+          saturate = Math.max(0.6, 0.78 - distanceBoost * 0.05);
+          zIndex = Math.max(8, 12 - distanceBoost);
+          shadow = '0 14px 38px rgba(0, 0, 0, 0.2)';
+        }
+
+        if (hoveredStackIndex !== -1 && hoveredStackIndex !== index && hoveredOffset !== null && hoveredOffset !== 0) {
+          const distanceFromHovered = Math.abs(offset - hoveredOffset);
+          const hoverDepth = Math.max(1, distanceFromHovered);
+          const rankedScale = Math.max(0.54, 0.92 - (hoverDepth - 1) * 0.1);
+          const rankedOpacity = Math.max(0.26, 0.92 - (hoverDepth - 1) * 0.15);
+          const rankedBrightness = Math.max(0.48, 0.9 - (hoverDepth - 1) * 0.08);
+          const rankedSaturate = Math.max(0.58, 0.92 - (hoverDepth - 1) * 0.06);
+
+          scale = rankedScale;
+          opacity = rankedOpacity;
+          brightness = rankedBrightness;
+          saturate = rankedSaturate;
+          zIndex = 30 - hoverDepth;
+          shadow = hoverDepth === 1
+            ? '0 20px 54px rgba(0, 0, 0, 0.26)'
+            : `0 ${Math.max(10, 18 - hoverDepth * 2)}px ${Math.max(22, 44 - hoverDepth * 4)}px rgba(0, 0, 0, ${Math.max(0.14, 0.24 - hoverDepth * 0.02)})`;
+        }
+
+        if (hoveredStackIndex === index) {
+          translateY -= 16 * compactMultiplier;
+          scale += distance === 0 ? 0.08 : 0.14;
+          opacity = 1;
+          brightness = 1;
+          saturate = 1.02;
+          zIndex = 40;
+          shadow = '0 36px 92px rgba(0, 0, 0, 0.42)';
+        }
+
+        card.style.setProperty('--card-x', `${translateX}px`);
+        card.style.setProperty('--card-y', `${translateY}px`);
+        card.style.setProperty('--card-rotate', `${rotate}deg`);
+        card.style.setProperty('--card-scale', `${scale}`);
+        card.style.setProperty('--card-opacity', `${opacity}`);
+        card.style.setProperty('--card-brightness', `${brightness}`);
+        card.style.setProperty('--card-saturate', `${saturate}`);
+        card.style.setProperty('--card-z', `${zIndex}`);
+        card.style.setProperty('--card-shadow', shadow);
+        card.dataset.captionVisible = hoveredStackIndex === index && selectedStackIndex === index ? 'true' : 'false';
+      });
+    };
+
+    stackCards.forEach((card, index) => {
+      card.addEventListener('mouseenter', () => {
+        hoveredStackIndex = index;
+        applyPhotoStackLayout();
+      });
+
+      card.addEventListener('mouseleave', () => {
+        if (hoveredStackIndex === index) {
+          hoveredStackIndex = -1;
+          if (selectedStackIndex === index) {
+            selectedStackIndex = -1;
+          }
+          applyPhotoStackLayout();
+        }
+      });
+
+      card.addEventListener('click', () => {
+        selectedStackIndex = index;
+        applyPhotoStackLayout();
+      });
+    });
+
+    window.addEventListener('scroll', () => {
+      if (getScrollY() <= TOP_RESET_THRESHOLD) {
+        userHasScrolled = false;
+      }
+
+      scheduleBrandUpdate();
+      updatePhotoStackSuction();
     }, { passive: true });
-    window.addEventListener('resize', measureBrand);
-    window.addEventListener('load', measureBrand);
-    document.fonts?.ready?.then(measureBrand);
+    window.addEventListener('resize', handleViewportChange);
+    window.addEventListener('load', () => {
+      measureBrand();
+      measurePhotoStackSuction();
+    });
+    window.addEventListener('pageshow', () => {
+      measureBrand();
+      measurePhotoStackSuction();
+    });
+    window.addEventListener('touchmove', markUserScrollIntent, { passive: true });
+    window.addEventListener('wheel', markUserScrollIntent, { passive: true });
+    window.visualViewport?.addEventListener('resize', handleViewportChange);
+    document.fonts?.ready?.then(() => {
+      measureBrand();
+      measurePhotoStackSuction();
+    });
+    window.setTimeout(() => {
+      measureBrand();
+      measurePhotoStackSuction();
+    }, 180);
+    applyPhotoStackLayout();
+    measurePhotoStackSuction();
     measureBrand();
   </script>
 </body>

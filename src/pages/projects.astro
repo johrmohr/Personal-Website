@@ -35,13 +35,19 @@ const projects = [
 </head>
 <body>
   <header class="site-header">
-    <a href="/" class="brand brand--static">Jordan Moreno</a>
-    <nav class="nav">
-      <a href="/#about">about</a>
-      <a href="/projects" class="active">projects</a>
-      <a href="/#experience">experience</a>
-      <a href="/#research">research</a>
-    </nav>
+    <div class="site-header-leading">
+      <a href="/" class="brand brand--static">Jordan Moreno</a>
+    </div>
+    <div class="site-header-trailing">
+      <nav class="nav">
+        <a href="/#about">about</a>
+        <a href="/projects" class="active">projects</a>
+        <a href="/#experience">experience</a>
+        <a href="/#research">research</a>
+      </nav>
+      <a href="/news2me" class="header-link">News2me</a>
+      <a href="/blog" class="header-link">Blog</a>
+    </div>
   </header>
 
   <main class="projects-page">
@@ -87,6 +93,8 @@ const projects = [
   </main>
 
   <footer class="site-footer">
+    <span class="footer-copy">&copy; <span id="year"></span></span>
+    <a href="/" class="footer-link">back to home</a>
     <div class="footer-icons" aria-label="Social links">
       <a href="https://github.com/johrmohr" target="_blank" rel="noopener" aria-label="GitHub" class="icon-link">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -110,8 +118,6 @@ const projects = [
         </svg>
       </a>
     </div>
-    <span>&copy; <span id="year"></span> Jordan Moreno</span>
-    <a href="/" class="footer-link">back to home</a>
   </footer>
 
   <script>
