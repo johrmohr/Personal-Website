@@ -61,7 +61,7 @@ const heroStackCaptions = [
       </a>
     </div>
     <div class="site-header-trailing">
-      <a href="/news2me" class="header-link">News2me</a>
+      <a href="/news2me" class="header-link">Daily</a>
       <a href="/blog" class="header-link">Blog</a>
     </div>
   </header>
@@ -93,6 +93,9 @@ const heroStackCaptions = [
         ))}
       </div>
     )}
+    <div class="hero-reveal-copy" aria-label="Intro text" data-reveal-state="hidden">
+      <p class="hero-reveal-line hero-reveal-line--lead">23, engineer, artist</p>
+    </div>
     <a href="/assets/resume.pdf" target="_blank" class="blackhole-link"><pre class="ascii-blackhole">
                                        @%%%%#####%%%%@
                                  @@%@%**+=--:..::--++*#%@@@
@@ -203,6 +206,7 @@ const heroStackCaptions = [
     const introCopy = brand?.querySelector('.brand-intro-copy');
     const surnameMeasure = brand?.querySelector('.brand-measure--surname');
     const hero = document.querySelector('.hero');
+    const heroRevealCopy = document.querySelector('.hero-reveal-copy');
     const photoStack = document.querySelector('[data-photo-stack]');
     const stackCards = photoStack ? Array.from(photoStack.querySelectorAll('[data-stack-card]')) : [];
     const blackholeLink = document.querySelector('.blackhole-link');
@@ -220,6 +224,9 @@ const heroStackCaptions = [
     let stackSuckDeltaX = 0;
     let stackSuckDeltaY = 0;
     let stackSuckDistance = 1;
+    let heroRevealSuckDeltaX = 0;
+    let heroRevealSuckDeltaY = 0;
+    let heroRevealTriggered = false;
 
     const getScrollY = () => Math.max(
       window.scrollY,
@@ -287,6 +294,20 @@ const heroStackCaptions = [
       userHasScrolled = true;
     };
 
+    const revealHeroCopy = () => {
+      if (!heroRevealCopy || heroRevealTriggered) {
+        return;
+      }
+
+      heroRevealTriggered = true;
+
+      window.requestAnimationFrame(() => {
+        window.setTimeout(() => {
+          heroRevealCopy.dataset.revealState = 'visible';
+        }, 140);
+      });
+    };
+
     const handleViewportChange = () => {
       measureBrand();
       applyPhotoStackLayout();
@@ -294,6 +315,23 @@ const heroStackCaptions = [
     };
 
     const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+    const setHeroRevealScrollState = (progress) => {
+      if (!heroRevealCopy) {
+        return;
+      }
+
+      const eased = 1 - Math.pow(1 - progress, 2.1);
+      const scale = 1 - (0.86 * eased);
+      const opacity = progress >= 0.96 ? 0 : Math.max(0, 1 - (0.96 * eased));
+      const blur = 3.2 * eased;
+
+      heroRevealCopy.style.setProperty('--copy-scroll-x', `${heroRevealSuckDeltaX * eased}px`);
+      heroRevealCopy.style.setProperty('--copy-scroll-y', `${heroRevealSuckDeltaY * eased}px`);
+      heroRevealCopy.style.setProperty('--copy-scroll-scale', `${scale}`);
+      heroRevealCopy.style.setProperty('--copy-scroll-opacity', `${opacity}`);
+      heroRevealCopy.style.setProperty('--copy-scroll-blur', `${blur}px`);
+    };
 
     const setPhotoStackScrollState = (progress) => {
       if (!photoStack) {
@@ -323,6 +361,7 @@ const heroStackCaptions = [
       const progress = clamp(scrollWithinHero / stackSuckDistance, 0, 1);
 
       setPhotoStackScrollState(progress);
+      setHeroRevealScrollState(progress);
     };
 
     const measurePhotoStackSuction = () => {
@@ -331,6 +370,7 @@ const heroStackCaptions = [
       }
 
       setPhotoStackScrollState(0);
+      setHeroRevealScrollState(0);
 
       const heroRect = hero.getBoundingClientRect();
       const stackRect = photoStack.getBoundingClientRect();
@@ -345,6 +385,15 @@ const heroStackCaptions = [
       stackSuckDeltaX = blackholeCenterX - stackCenterX;
       stackSuckDeltaY = blackholeCenterY - stackCenterY;
       stackSuckDistance = Math.max(220, blackholeTop - stackBottom);
+
+      if (heroRevealCopy) {
+        const heroRevealRect = heroRevealCopy.getBoundingClientRect();
+        const heroRevealCenterX = heroRevealRect.left + (heroRevealRect.width / 2) - heroRect.left;
+        const heroRevealCenterY = heroRevealRect.top + (heroRevealRect.height / 2) - heroRect.top;
+
+        heroRevealSuckDeltaX = blackholeCenterX - heroRevealCenterX;
+        heroRevealSuckDeltaY = blackholeCenterY - heroRevealCenterY;
+      }
 
       updatePhotoStackSuction();
     };
@@ -492,10 +541,12 @@ const heroStackCaptions = [
     window.addEventListener('load', () => {
       measureBrand();
       measurePhotoStackSuction();
+      revealHeroCopy();
     });
     window.addEventListener('pageshow', () => {
       measureBrand();
       measurePhotoStackSuction();
+      revealHeroCopy();
     });
     window.addEventListener('touchmove', markUserScrollIntent, { passive: true });
     window.addEventListener('wheel', markUserScrollIntent, { passive: true });
@@ -511,6 +562,7 @@ const heroStackCaptions = [
     applyPhotoStackLayout();
     measurePhotoStackSuction();
     measureBrand();
+    revealHeroCopy();
   </script>
 </body>
 </html>
