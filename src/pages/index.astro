@@ -1,39 +1,8 @@
 ---
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import '../styles/site.css';
 import VideoScrubber from '../components/VideoScrubber.astro';
 
-const currentFile = fileURLToPath(import.meta.url);
-const currentDir = path.dirname(currentFile);
-const assetsDir = path.resolve(currentDir, '../../public/assets');
-const heroStackPattern = /^hero-stack-(\d+)\.(avif|jpe?g|png|webp)$/i;
-
-const heroStackImages = fs
-  .readdirSync(assetsDir)
-  .map((file) => {
-    const match = file.match(heroStackPattern);
-
-    if (!match) {
-      return null;
-    }
-
-    return {
-      file,
-      order: Number(match[1]),
-      src: `/assets/${file}`,
-      alt: `Hero photo ${Number(match[1])}`
-    };
-  })
-  .filter((image) => image !== null)
-  .sort((left, right) => left.order - right.order);
-
-const heroStackCaptions = [
-  'Ibaraki, JP 2024',
-  'Newport, CA 2025',
-  'Irvine, CA 2026'
-];
+const signatureVideoSrc = '/assets/signature.mp4';
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -68,33 +37,31 @@ const heroStackCaptions = [
 
   <!-- Hero section with ASCII black hole -->
   <section class="hero">
-    {heroStackImages.length > 0 && (
-      <div class="hero-photo-stack" aria-label="Photo stack" data-photo-stack>
-        {heroStackImages.map((image, index) => (
-          <button
-            type="button"
-            class="hero-photo-card"
-            data-stack-card
-            data-stack-index={index}
-            data-stack-caption={heroStackCaptions[index] ?? ''}
-            aria-label={`Show details for photo ${index + 1}`}
+    <div class="hero-photo-stack hero-photo-stack--signature" aria-label="Signature animation" data-photo-stack>
+      <button
+        type="button"
+        class="hero-photo-card hero-photo-card--signature"
+        data-stack-card
+        data-stack-index="0"
+        aria-label="Replay signature animation"
+      >
+        <span class="hero-photo-card-frame hero-photo-card-frame--signature">
+          <video
+            src={signatureVideoSrc}
+            class="hero-photo-image hero-signature-video"
+            data-signature-video
+            muted
+            playsinline
+            preload="auto"
+            autoplay
+            disablepictureinpicture
           >
-            <span class="hero-photo-card-caption" aria-hidden="true">{heroStackCaptions[index] ?? ''}</span>
-            <span class="hero-photo-card-frame">
-              <img
-                src={image.src}
-                alt={image.alt}
-                class="hero-photo-image"
-                loading={index === 0 ? 'eager' : 'lazy'}
-                decoding="async"
-              />
-            </span>
-          </button>
-        ))}
-      </div>
-    )}
+          </video>
+        </span>
+      </button>
+    </div>
     <div class="hero-reveal-copy" aria-label="Intro text" data-reveal-state="hidden">
-      <p class="hero-reveal-line hero-reveal-line--lead">23, engineer, artist</p>
+      <p class="hero-reveal-line hero-reveal-line--lead">SWE @ UCI</p>
     </div>
     <a href="/assets/resume.pdf" target="_blank" class="blackhole-link"><pre class="ascii-blackhole">
                                        @%%%%#####%%%%@
@@ -209,6 +176,7 @@ const heroStackCaptions = [
     const heroRevealCopy = document.querySelector('.hero-reveal-copy');
     const photoStack = document.querySelector('[data-photo-stack]');
     const stackCards = photoStack ? Array.from(photoStack.querySelectorAll('[data-stack-card]')) : [];
+    const signatureVideo = document.querySelector('[data-signature-video]');
     const blackholeLink = document.querySelector('.blackhole-link');
     const MOBILE_BREAKPOINT = 768;
     const TOP_RESET_THRESHOLD = 2;
@@ -306,6 +274,59 @@ const heroStackCaptions = [
           heroRevealCopy.dataset.revealState = 'visible';
         }, 140);
       });
+    };
+
+    const maybeAutoplaySignatureVideo = () => {
+      if (!(signatureVideo instanceof HTMLVideoElement)) {
+        return;
+      }
+
+      signatureVideo.muted = true;
+      signatureVideo.defaultMuted = true;
+      signatureVideo.playsInline = true;
+
+      if (!signatureVideo.paused || signatureVideo.currentTime > 0) {
+        return;
+      }
+
+      const playback = signatureVideo.play();
+
+      if (playback && typeof playback.catch === 'function') {
+        playback.catch(() => {});
+      }
+    };
+
+    const replaySignatureVideo = () => {
+      if (!(signatureVideo instanceof HTMLVideoElement)) {
+        return;
+      }
+
+      signatureVideo.muted = true;
+      signatureVideo.defaultMuted = true;
+      signatureVideo.playsInline = true;
+
+      const playFromStart = () => {
+        signatureVideo.pause();
+
+        try {
+          signatureVideo.currentTime = 0;
+        } catch {
+          return;
+        }
+
+        const playback = signatureVideo.play();
+
+        if (playback && typeof playback.catch === 'function') {
+          playback.catch(() => {});
+        }
+      };
+
+      if (signatureVideo.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        playFromStart();
+        return;
+      }
+
+      signatureVideo.addEventListener('loadeddata', playFromStart, { once: true });
     };
 
     const handleViewportChange = () => {
@@ -511,6 +532,13 @@ const heroStackCaptions = [
       card.addEventListener('mouseenter', () => {
         hoveredStackIndex = index;
         applyPhotoStackLayout();
+        replaySignatureVideo();
+      });
+
+      card.addEventListener('focus', () => {
+        hoveredStackIndex = index;
+        applyPhotoStackLayout();
+        replaySignatureVideo();
       });
 
       card.addEventListener('mouseleave', () => {
@@ -523,9 +551,22 @@ const heroStackCaptions = [
         }
       });
 
+      card.addEventListener('blur', () => {
+        if (hoveredStackIndex === index) {
+          hoveredStackIndex = -1;
+
+          if (selectedStackIndex === index) {
+            selectedStackIndex = -1;
+          }
+
+          applyPhotoStackLayout();
+        }
+      });
+
       card.addEventListener('click', () => {
         selectedStackIndex = index;
         applyPhotoStackLayout();
+        replaySignatureVideo();
       });
     });
 
@@ -542,11 +583,16 @@ const heroStackCaptions = [
       measureBrand();
       measurePhotoStackSuction();
       revealHeroCopy();
+      maybeAutoplaySignatureVideo();
     });
-    window.addEventListener('pageshow', () => {
+    window.addEventListener('pageshow', (event) => {
       measureBrand();
       measurePhotoStackSuction();
       revealHeroCopy();
+
+      if (event.persisted) {
+        replaySignatureVideo();
+      }
     });
     window.addEventListener('touchmove', markUserScrollIntent, { passive: true });
     window.addEventListener('wheel', markUserScrollIntent, { passive: true });
@@ -555,6 +601,7 @@ const heroStackCaptions = [
       measureBrand();
       measurePhotoStackSuction();
     });
+    signatureVideo?.addEventListener('loadeddata', maybeAutoplaySignatureVideo);
     window.setTimeout(() => {
       measureBrand();
       measurePhotoStackSuction();

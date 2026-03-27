@@ -30,8 +30,9 @@ a {
 /* Hero section */
 .hero {
   --hero-stack-top: clamp(136px, 15vh, 204px);
-  --hero-stack-card-width: clamp(192px, 18vw, 244px);
-  --hero-stack-height-multiplier: 1.5;
+  --hero-stack-card-width: clamp(320px, 42vw, 560px);
+  --hero-stack-height-multiplier: 0.57;
+  --hero-reveal-overlap: clamp(26px, 3.6vw, 44px);
   --hero-blackhole-gap: 578px;
   min-height: 100vh;
   display: flex;
@@ -94,6 +95,10 @@ a {
   will-change: transform, opacity, filter;
 }
 
+.hero-photo-card--signature {
+  aspect-ratio: 1172 / 630;
+}
+
 .hero-photo-card-frame {
   position: absolute;
   inset: 0;
@@ -105,12 +110,25 @@ a {
   filter: saturate(var(--card-saturate, 1)) brightness(var(--card-brightness, 1));
 }
 
+.hero-photo-card-frame--signature {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  filter: none;
+}
+
 .hero-photo-card-frame::after {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.08) 100%);
   pointer-events: none;
+}
+
+.hero-photo-card-frame--signature::after {
+  background: none;
 }
 
 .hero-photo-card:focus-visible {
@@ -123,6 +141,12 @@ a {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.hero-signature-video {
+  object-fit: contain;
+  background: transparent;
+  pointer-events: none;
 }
 
 .hero-photo-card-caption {
@@ -161,7 +185,7 @@ a {
   --copy-scroll-opacity: 1;
   --copy-scroll-blur: 0px;
   position: absolute;
-  top: calc(var(--hero-stack-top) + (var(--hero-stack-card-width) * var(--hero-stack-height-multiplier)) + clamp(52px, 6vw, 76px));
+  top: calc(var(--hero-stack-top) + (var(--hero-stack-card-width) * var(--hero-stack-height-multiplier)) - var(--hero-reveal-overlap));
   left: 50%;
   z-index: 2;
   width: min(560px, calc(100vw - 40px));
@@ -324,8 +348,9 @@ a {
 
 @media (max-width: 1024px) {
   .hero {
-    --hero-stack-card-width: clamp(184px, 25vw, 228px);
-    --hero-stack-height-multiplier: 1.48;
+    --hero-stack-card-width: clamp(300px, 54vw, 500px);
+    --hero-stack-height-multiplier: 0.59;
+    --hero-reveal-overlap: clamp(22px, 3.4vw, 36px);
     --hero-blackhole-gap: clamp(220px, 30vw, 320px);
   }
 
@@ -345,8 +370,9 @@ a {
 @media (max-width: 768px) {
   .hero {
     --hero-stack-top: 122px;
-    --hero-stack-card-width: clamp(146px, 40vw, 182px);
-    --hero-stack-height-multiplier: 1.52;
+    --hero-stack-card-width: clamp(260px, 82vw, 420px);
+    --hero-stack-height-multiplier: 0.62;
+    --hero-reveal-overlap: 20px;
     --hero-blackhole-gap: clamp(214px, 40vw, 290px);
   }
 
@@ -358,8 +384,13 @@ a {
     border-radius: 20px;
   }
 
+  .hero-photo-card-frame--signature {
+    border-radius: 0;
+    padding: 0;
+  }
+
   .hero-reveal-copy {
-    top: calc(var(--hero-stack-top) + (var(--hero-stack-card-width) * var(--hero-stack-height-multiplier)) + 40px);
+    top: calc(var(--hero-stack-top) + (var(--hero-stack-card-width) * var(--hero-stack-height-multiplier)) - var(--hero-reveal-overlap));
     width: min(340px, calc(100vw - 32px));
   }
 
