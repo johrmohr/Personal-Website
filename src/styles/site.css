@@ -145,7 +145,7 @@ a {
 
 .hero-signature-video {
   object-fit: contain;
-  background: transparent;
+  background: #000;
   pointer-events: none;
 }
 
