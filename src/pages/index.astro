@@ -25,12 +25,12 @@ const signatureVideoSrc = '/assets/signature.mp4';
 
   <header class="site-header site-header--home">
     <div class="site-header-leading">
-      <a href="/" class="brand brand--home" aria-label="Jordan Moreno" data-brand-state="expanded" data-brand-ready="false">
+      <a href="/" class="brand brand--home" aria-label="Jordan Moreno" data-brand-state="expanded" data-brand-ready="false" data-brand-animate="false">
         <span class="brand-home" aria-hidden="true"><span class="brand-intro"><span class="brand-intro-copy">hi, i'm</span></span><span class="brand-name">Jordan</span><span class="brand-surname"><span class="brand-surname-copy">Moreno</span></span><span class="brand-measure brand-measure--surname">Moreno</span></span>
       </a>
     </div>
     <div class="site-header-trailing">
-      <a href="/news2me" class="header-link">Daily</a>
+      <a href="/daily" class="header-link">Daily</a>
       <a href="/blog" class="header-link">Blog</a>
     </div>
   </header>
@@ -178,6 +178,19 @@ const signatureVideoSrc = '/assets/signature.mp4';
     const stackCards = photoStack ? Array.from(photoStack.querySelectorAll('[data-stack-card]')) : [];
     const signatureVideo = document.querySelector('[data-signature-video]');
     const blackholeLink = document.querySelector('.blackhole-link');
+    const sameOriginReferrer = (() => {
+      try {
+        const referrerUrl = new URL(document.referrer);
+        return referrerUrl.origin === window.location.origin ? referrerUrl : null;
+      } catch {
+        return null;
+      }
+    })();
+    const shouldAnimateHomeReturn = Boolean(
+      sameOriginReferrer &&
+      sameOriginReferrer.pathname !== '/' &&
+      sameOriginReferrer.pathname !== '/index.html'
+    );
     const MOBILE_BREAKPOINT = 768;
     const TOP_RESET_THRESHOLD = 2;
     const COLLAPSE_SCROLL_THRESHOLD = 12;
@@ -195,6 +208,7 @@ const signatureVideoSrc = '/assets/signature.mp4';
     let heroRevealSuckDeltaX = 0;
     let heroRevealSuckDeltaY = 0;
     let heroRevealTriggered = false;
+    let brandInitialized = false;
 
     const getScrollY = () => Math.max(
       window.scrollY,
@@ -243,12 +257,28 @@ const signatureVideoSrc = '/assets/signature.mp4';
       surnameWidth = surnameMeasure.getBoundingClientRect().width;
       brand.style.setProperty('--brand-intro-full-width', `${introWidth}px`);
       brand.style.setProperty('--brand-surname-full-width', `${surnameWidth}px`);
-      updateBrand();
-      if (brand.dataset.brandReady !== 'true') {
+      
+      if (!brandInitialized) {
+        brandInitialized = true;
+        brand.dataset.brandState = shouldAnimateHomeReturn ? 'collapsed' : 'expanded';
+        brand.dataset.brandReady = 'true';
+
         window.requestAnimationFrame(() => {
-          brand.dataset.brandReady = 'true';
+          brand.dataset.brandAnimate = 'true';
+
+          if (shouldAnimateHomeReturn) {
+            window.requestAnimationFrame(() => {
+              setBrandState('expanded');
+            });
+          } else {
+            updateBrand();
+          }
         });
+
+        return;
       }
+
+      updateBrand();
     };
 
     const scheduleBrandUpdate = () => {

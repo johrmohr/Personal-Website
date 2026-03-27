@@ -1,0 +1,52 @@
+---
+import '../../styles/site.css';
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy - Daily</title>
+  <link rel="icon" type="image/png" href="/Blackhole.png">
+</head>
+<body class="plain-page-body">
+  <header class="site-header">
+    <div class="site-header-leading">
+      <a href="/" class="brand brand--static" aria-label="Jordan Moreno">Jordan Moreno</a>
+    </div>
+    <div class="site-header-trailing">
+      <a href="/daily" class="header-link">Daily</a>
+      <a href="/blog" class="header-link">Blog</a>
+    </div>
+  </header>
+
+  <main class="privacy-page">
+    <div class="privacy-content">
+      <h1>Privacy Policy for Daily</h1>
+      <p class="privacy-updated"><em>Last updated: March 27, 2026</em></p>
+
+      <p>Daily is a personal journaling app. Your privacy is important to us.</p>
+
+      <h2>Data Collection</h2>
+      <p>Daily does not collect, store, or transmit any personal data to external servers. All journal entries, photos, and attachments are stored locally on your device.</p>
+
+      <h2>Third-Party Services</h2>
+      <p>Daily does not use any third-party analytics, advertising, or tracking services.</p>
+
+      <h2>Biometric Data</h2>
+      <p>Daily offers an optional Face ID lock feature. Biometric authentication is handled entirely by your device's operating system. Daily does not access, store, or process any biometric data.</p>
+
+      <h2>Contact</h2>
+      <p>If you have questions about this privacy policy, you can reach me at <a href="mailto:jordan@accentuateai.app">jordan@accentuateai.app</a></p>
+    </div>
+  </main>
+
+  <footer class="site-footer plain-page-footer">
+    <span class="footer-copy">&copy; <span id="year"></span></span>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear().toString();
+  </script>
+</body>
+</html>
