@@ -29,11 +29,11 @@ a {
 
 /* Hero section */
 .hero {
-  --hero-stack-top: clamp(136px, 15vh, 204px);
-  --hero-stack-card-width: clamp(320px, 42vw, 560px);
-  --hero-stack-height-multiplier: 0.57;
-  --hero-reveal-overlap: clamp(26px, 3.6vw, 44px);
-  --hero-blackhole-gap: 578px;
+  --hero-stack-top: clamp(176px, 24vh, 232px);
+  --hero-stack-card-width: 0px;
+  --hero-stack-height-multiplier: 0;
+  --hero-reveal-overlap: 0px;
+  --hero-blackhole-gap: clamp(120px, 16vh, 168px);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -42,140 +42,6 @@ a {
   text-align: center;
   padding: 120px 24px 60px;
   position: relative;
-}
-
-.hero-photo-stack {
-  --stack-card-width: var(--hero-stack-card-width);
-  --stack-scroll-x: 0px;
-  --stack-scroll-y: 0px;
-  --stack-scroll-scale: 1;
-  --stack-scroll-opacity: 1;
-  --stack-scroll-blur: 0px;
-  position: absolute;
-  top: var(--hero-stack-top);
-  left: 50%;
-  z-index: 1;
-  width: min(620px, calc(100vw - 32px));
-  height: calc(var(--stack-card-width) * var(--hero-stack-height-multiplier));
-  opacity: var(--stack-scroll-opacity);
-  filter: blur(var(--stack-scroll-blur));
-  transform:
-    translateX(-50%)
-    translate3d(var(--stack-scroll-x), var(--stack-scroll-y), 0)
-    scale(var(--stack-scroll-scale));
-  transform-origin: center center;
-  will-change: transform, opacity, filter;
-}
-
-.hero-photo-card {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: var(--stack-card-width);
-  aspect-ratio: 3 / 4;
-  appearance: none;
-  padding: 0;
-  margin: 0;
-  overflow: visible;
-  border: 0;
-  background: transparent;
-  opacity: var(--card-opacity, 1);
-  z-index: var(--card-z, 1);
-  cursor: pointer;
-  transform:
-    translate(-50%, -50%)
-    translate3d(var(--card-x, 0px), var(--card-y, 0px), 0)
-    rotate(var(--card-rotate, 0deg))
-    scale(var(--card-scale, 1));
-  transition:
-    transform 820ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 380ms ease,
-    filter 820ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 820ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform, opacity, filter;
-}
-
-.hero-photo-card--signature {
-  aspect-ratio: 1172 / 630;
-}
-
-.hero-photo-card-frame {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  border-radius: 26px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(18, 18, 18, 0.92);
-  box-shadow: var(--card-shadow, 0 18px 48px rgba(0, 0, 0, 0.28));
-  filter: saturate(var(--card-saturate, 1)) brightness(var(--card-brightness, 1));
-}
-
-.hero-photo-card-frame--signature {
-  border: 0;
-  border-radius: 0;
-  padding: 0;
-  background: transparent;
-  box-shadow: none;
-  filter: none;
-}
-
-.hero-photo-card-frame::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.08) 100%);
-  pointer-events: none;
-}
-
-.hero-photo-card-frame--signature::after {
-  background: none;
-}
-
-.hero-photo-card:focus-visible {
-  outline: 2px solid rgba(245, 244, 242, 0.9);
-  outline-offset: 5px;
-}
-
-.hero-photo-image {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.hero-signature-video {
-  object-fit: contain;
-  background: #000;
-  pointer-events: none;
-}
-
-.hero-photo-card-caption {
-  position: absolute;
-  left: 50%;
-  top: 8px;
-  z-index: 2;
-  pointer-events: none;
-  opacity: 0;
-  transform: translate(-50%, calc(-100% + 3px));
-  transition:
-    opacity 180ms ease,
-    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
-  padding: 6px 10px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
-  background: rgba(8, 8, 8, 0.86);
-  color: #ffffff;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  line-height: 1;
-  white-space: nowrap;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
-}
-
-.hero-photo-card[data-caption-visible='true'] .hero-photo-card-caption {
-  opacity: 1;
-  transform: translate(-50%, calc(-100% + 1px));
 }
 
 .hero-reveal-copy {
@@ -348,18 +214,12 @@ a {
 
 @media (max-width: 1024px) {
   .hero {
-    --hero-stack-card-width: clamp(300px, 54vw, 500px);
-    --hero-stack-height-multiplier: 0.59;
-    --hero-reveal-overlap: clamp(22px, 3.4vw, 36px);
-    --hero-blackhole-gap: clamp(220px, 30vw, 320px);
+    --hero-stack-top: clamp(164px, 22vh, 212px);
+    --hero-blackhole-gap: clamp(108px, 16vw, 152px);
   }
 
   .bio-content {
     margin-top: var(--hero-blackhole-gap);
-  }
-
-  .hero-photo-stack {
-    width: min(560px, calc(100vw - 28px));
   }
 
   .hero-reveal-copy {
@@ -369,24 +229,8 @@ a {
 
 @media (max-width: 768px) {
   .hero {
-    --hero-stack-top: 122px;
-    --hero-stack-card-width: clamp(260px, 82vw, 420px);
-    --hero-stack-height-multiplier: 0.62;
-    --hero-reveal-overlap: 20px;
-    --hero-blackhole-gap: clamp(214px, 40vw, 290px);
-  }
-
-  .hero-photo-stack {
-    width: calc(100vw - 12px);
-  }
-
-  .hero-photo-card {
-    border-radius: 20px;
-  }
-
-  .hero-photo-card-frame--signature {
-    border-radius: 0;
-    padding: 0;
+    --hero-stack-top: 156px;
+    --hero-blackhole-gap: clamp(96px, 22vw, 136px);
   }
 
   .hero-reveal-copy {
