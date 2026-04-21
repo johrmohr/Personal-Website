@@ -35,12 +35,14 @@ import VideoScrubber from '../components/VideoScrubber.astro';
     </div>
   </header>
 
-  <!-- Hero section with ASCII black hole -->
+  <!-- Hero section with preserved spacing from removed hero art -->
   <section class="hero">
+    <div class="hero-signature-spacer" aria-hidden="true"></div>
     <div class="hero-reveal-copy" aria-label="Intro text" data-reveal-state="hidden">
       <p class="hero-reveal-line hero-reveal-line--lead">SWE @ UCI</p>
     </div>
-    <a href="/assets/resume.pdf" target="_blank" class="blackhole-link"><pre class="ascii-blackhole">
+    <div class="blackhole-link hero-blackhole-spacer" aria-hidden="true">
+      <pre class="ascii-blackhole">
                                        @%%%%#####%%%%@
                                  @@%@%**+=--:..::--++*#%@@@
                             %#%@#**-.                  .-=*#%%@
@@ -62,7 +64,8 @@ import VideoScrubber from '../components/VideoScrubber.astro';
                                   @@@=                .+@@@
                                      @%*=.         -=#@@
                                        %@@%@@@@@@@%@@%
-</pre></a>
+</pre>
+    </div>
     <div class="bio-content">
       <div class="bio-columns">
         <div class="bio-column">
