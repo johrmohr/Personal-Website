@@ -23,24 +23,17 @@ import VideoScrubber from '../components/VideoScrubber.astro';
 <body>
   <VideoScrubber />
 
-  <header class="site-header site-header--home">
-    <div class="site-header-leading">
-      <a href="/" class="brand brand--home" aria-label="Jordan Moreno" data-brand-state="expanded" data-brand-ready="false" data-brand-animate="false">
-        <span class="brand-home" aria-hidden="true"><span class="brand-intro"><span class="brand-intro-copy">hi, i'm</span></span><span class="brand-name">Jordan</span><span class="brand-surname"><span class="brand-surname-copy">Moreno</span></span><span class="brand-measure brand-measure--surname">Moreno</span></span>
-      </a>
-    </div>
-    <div class="site-header-trailing">
-      <a href="/daily" class="header-link">Daily</a>
-      <a href="/blog" class="header-link">Blog</a>
-    </div>
-  </header>
-
   <!-- Hero section with preserved spacing from removed hero art -->
   <section class="hero">
     <div class="hero-signature-spacer" aria-hidden="true"></div>
-    <div class="hero-reveal-copy" aria-label="Intro text" data-reveal-state="hidden">
-      <p class="hero-reveal-line hero-reveal-line--lead">SWE @ UCI</p>
+    <div class="hero-pin-track">
+      <div class="hero-reveal-copy" aria-label="Intro text" data-reveal-state="hidden">
+        <a href="/" class="brand brand--home brand--hero" aria-label="Jordan Moreno" data-brand-state="expanded" data-brand-ready="false" data-brand-animate="false">
+          <span class="brand-home" aria-hidden="true"><span class="brand-intro"><span class="brand-intro-copy">hi, i'm</span></span><span class="brand-name">Jordan</span><span class="brand-surname"><span class="brand-surname-copy">Moreno</span></span><span class="brand-measure brand-measure--surname">Moreno</span></span>
+        </a>
+      </div>
     </div>
+    <span class="brand-intro-ghost" aria-hidden="true">hi, i'm</span>
     <div class="blackhole-link hero-blackhole-spacer" aria-hidden="true">
       <pre class="ascii-blackhole">
                                        @%%%%#####%%%%@
@@ -95,14 +88,19 @@ import VideoScrubber from '../components/VideoScrubber.astro';
   <div class="projects-container">
     <h2 class="projects-title">projects</h2>
     <div class="projects-row">
-      <a href="http://64.181.241.137:8000/" target="_blank" class="project-card">
-        <img src="/assets/rag-preview.png" alt="RAG Preview" class="project-image" />
-        <h3 class="project-title">Retrieval-Augmented Generation</h3>
-      </a>
-
       <a href="https://accentuateai.app" target="_blank" class="project-card">
         <img src="/assets/accentuate-preview.png" alt="Accentuate Preview" class="project-image" />
         <h3 class="project-title">Accentuate</h3>
+      </a>
+
+      <a href="/daily" class="project-card">
+        <img src="/assets/daily-preview.png" alt="Daily Preview" class="project-image" />
+        <h3 class="project-title">Daily</h3>
+      </a>
+
+      <a href="http://64.181.241.137:8000/" target="_blank" class="project-card">
+        <img src="/assets/rag-preview.png" alt="RAG Preview" class="project-image" />
+        <h3 class="project-title">Retrieval-Augmented Generation</h3>
       </a>
 
       <a href="https://crewchat.ai" target="_blank" class="project-card">
@@ -176,11 +174,13 @@ import VideoScrubber from '../components/VideoScrubber.astro';
     let surnameWidth = 0;
     let ticking = false;
     let userHasScrolled = false;
-    let heroRevealSuckDeltaX = 0;
-    let heroRevealSuckDeltaY = 0;
     let heroRevealSuckDistance = 1;
+    let heroTopDoc = 0;
+    let introStartX = 0;
+    let introStartY = 0;
     let heroRevealTriggered = false;
     let brandInitialized = false;
+    const introGhost = document.querySelector('.brand-intro-ghost');
 
     const getScrollY = () => Math.max(
       window.scrollY,
@@ -285,21 +285,31 @@ import VideoScrubber from '../components/VideoScrubber.astro';
 
     const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
-    const setHeroRevealScrollState = (progress) => {
-      if (!heroRevealCopy) {
+    const setHeroRevealScrollState = (scrollWithinHero) => {
+      // The name itself is pinned by position: sticky (see .hero-pin-track) —
+      // no JS involved. Only the falling "hi, i'm" ghost is driven from here.
+      if (!introGhost) {
         return;
       }
 
+      // The "hi, i'm" ghost detaches from the name and falls into the visible
+      // black hole, which lives on the fixed ascii canvas at roughly the center
+      // of the viewport (~68% down). Its dive finishes faster than the pin.
+      const ghostDistance = Math.min(heroRevealSuckDistance, 420);
+      const progress = clamp(scrollWithinHero / ghostDistance, 0, 1);
       const eased = 1 - Math.pow(1 - progress, 2.1);
-      const scale = 1 - (0.86 * eased);
-      const opacity = progress >= 0.96 ? 0 : Math.max(0, 1 - (0.96 * eased));
+      const collapsed = brand?.dataset.brandState === 'collapsed';
+      const holeViewX = window.innerWidth * 0.5;
+      const holeViewY = window.innerHeight * 0.68;
+      const dx = (holeViewX - introStartX) * eased;
+      const dy = (holeViewY - introStartY) * eased;
+      const scale = 1 - (0.9 * eased);
+      const opacity = (!collapsed || progress >= 0.82) ? 0 : Math.max(0, 1 - (1.2 * eased));
       const blur = 3.2 * eased;
 
-      heroRevealCopy.style.setProperty('--copy-scroll-x', `${heroRevealSuckDeltaX * eased}px`);
-      heroRevealCopy.style.setProperty('--copy-scroll-y', `${heroRevealSuckDeltaY * eased}px`);
-      heroRevealCopy.style.setProperty('--copy-scroll-scale', `${scale}`);
-      heroRevealCopy.style.setProperty('--copy-scroll-opacity', `${opacity}`);
-      heroRevealCopy.style.setProperty('--copy-scroll-blur', `${blur}px`);
+      introGhost.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(${scale})`;
+      introGhost.style.opacity = `${opacity}`;
+      introGhost.style.filter = `blur(${blur}px)`;
     };
 
     const updateHeroRevealSuction = () => {
@@ -307,11 +317,7 @@ import VideoScrubber from '../components/VideoScrubber.astro';
         return;
       }
 
-      const heroTop = hero.getBoundingClientRect().top + window.scrollY;
-      const scrollWithinHero = Math.max(0, window.scrollY - heroTop);
-      const progress = clamp(scrollWithinHero / heroRevealSuckDistance, 0, 1);
-
-      setHeroRevealScrollState(progress);
+      setHeroRevealScrollState(getScrollY() - heroTopDoc);
     };
 
     const measureHeroRevealSuction = () => {
@@ -321,19 +327,21 @@ import VideoScrubber from '../components/VideoScrubber.astro';
 
       setHeroRevealScrollState(0);
 
-      const heroRect = hero.getBoundingClientRect();
+      const scrollYNow = getScrollY();
+      heroTopDoc = hero.getBoundingClientRect().top + scrollYNow;
+
       const blackholeRect = blackholeLink.getBoundingClientRect();
       const heroRevealRect = heroRevealCopy.getBoundingClientRect();
-      const blackholeCenterX = blackholeRect.left + (blackholeRect.width / 2) - heroRect.left;
-      const blackholeCenterY = blackholeRect.top + (blackholeRect.height / 2) - heroRect.top;
-      const blackholeTop = blackholeRect.top - heroRect.top;
-      const heroRevealCenterX = heroRevealRect.left + (heroRevealRect.width / 2) - heroRect.left;
-      const heroRevealCenterY = heroRevealRect.top + (heroRevealRect.height / 2) - heroRect.top;
-      const heroRevealBottom = heroRevealRect.bottom - heroRect.top;
+      const heroRevealBottomDoc = heroRevealRect.bottom + scrollYNow;
+      heroRevealSuckDistance = Math.max(180, (blackholeRect.top + scrollYNow) - heroRevealBottomDoc);
 
-      heroRevealSuckDeltaX = blackholeCenterX - heroRevealCenterX;
-      heroRevealSuckDeltaY = blackholeCenterY - heroRevealCenterY;
-      heroRevealSuckDistance = Math.max(180, blackholeTop - heroRevealBottom);
+      if (introGhost && introCopy) {
+        const introRect = introCopy.getBoundingClientRect();
+        introStartX = introRect.left + (introRect.width / 2);
+        introStartY = introRect.top + (introRect.height / 2);
+        introGhost.style.left = `${introRect.left}px`;
+        introGhost.style.top = `${introRect.top}px`;
+      }
 
       updateHeroRevealSuction();
     };

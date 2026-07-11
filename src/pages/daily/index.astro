@@ -1,186 +1,185 @@
 ---
-import '../../styles/site.css';
+// Standalone page for the Daily app. Lives under jordanmoreno.me/daily but is
+// intentionally its own thing — no site header, no links back to the personal site.
+const appStoreUrl = 'https://apps.apple.com/us/app/daily-private-journal/id6761246834';
 ---
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daily - Jordan Moreno</title>
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" href="/favicon.png">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <title>Daily — Private Journal</title>
+  <meta name="description" content="Daily: Your private, minimalist, everyday journal. Write one entry a day, keep track of your entries over time.">
+  <meta property="og:title" content="Daily — Private Journal">
+  <meta property="og:description" content="The most minimal everyday journal on your phone.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jordanmoreno.me/daily">
+  <meta property="og:image" content="https://jordanmoreno.me/assets/daily-icon.png">
+  <link rel="icon" type="image/png" href="/assets/daily-icon.png">
+  <link rel="apple-touch-icon" href="/assets/daily-icon.png">
 </head>
-<body class="plain-page-body">
-  <header class="site-header">
-    <div class="site-header-leading">
-      <a href="/" class="brand brand--static" aria-label="Jordan Moreno">Jordan Moreno</a>
+<body>
+  <main class="page">
+    <h1 class="wordmark">Daily</h1>
+
+    <p class="headline">The most minimal everyday&nbsp;journal on your&nbsp;phone</p>
+
+    <div class="phone" role="img" aria-label="iPhone showing the Daily app icon on a black screen">
+      <div class="phone-screen">
+        <span class="phone-island" aria-hidden="true"></span>
+        <img src="/assets/daily-icon.png" alt="" class="phone-icon" width="96" height="96" loading="lazy">
+      </div>
     </div>
-    <div class="site-header-trailing">
-      <a href="/daily" class="header-link" aria-current="page">Daily</a>
-      <a href="/blog" class="header-link">Blog</a>
-    </div>
-  </header>
 
-  <main class="news2me-page">
-    <section class="news2me-section news2me-section--hero" aria-label="Daily page hero">
-      <div class="news2me-shell">
-        <div class="news2me-hero-grid">
-          <div class="news2me-hero-titleblock">
-            <div class="news2me-date-row">
-              <div class="news2me-mark" aria-hidden="true">
-                <img src="/assets/calendar-icon.png" alt="" width="52" height="52" />
-              </div>
-              <h1 class="news2me-date" id="news2me-current-date">March 9, 2026</h1>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="news2me-section news2me-section--framed" aria-labelledby="news2me-feature-title">
-      <div class="news2me-shell">
-        <div class="news2me-divider" aria-hidden="true"></div>
-      </div>
-      <div class="news2me-shell">
-        <div class="news2me-feature-grid">
-          <div class="news2me-feature-copy">
-            <div class="news2me-feature-header">
-              <span class="news2me-feature-label"></span>
-              <h2 id="news2me-feature-title" class="news2me-feature-title">
-                Daily: Your Everyday Journal
-              </h2>
-            </div>
-            <div class="news2me-feature-footer">
-              <p class="news2me-feature-text">
-                Journaling helps me tremendously, being present and taking time to reflect on each day has been huge for my memory and growth. I built Daily as a the most simple, minimalist app for journaling every day, and I hope to update regularly to improve my personal tech stack.
-              </p>
-              <a href="/daily/privacypolicy" class="news2me-cta">
-                <span>Privacy Policy</span>
-                <span class="news2me-cta-icon" aria-hidden="true">
-                  <svg width="20" height="20" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M4.14585 9.87492L14.4584 9.87492L9.60419 5.04158L10.5 4.14575L16.8542 10.4999L10.5 16.8541L9.60419 15.9583L14.4584 11.1249L4.14585 11.1249L4.14585 9.87492Z" fill="currentColor"></path>
-                  </svg>
-                </span>
-              </a>
-            </div>
-          </div>
-
-          <div class="news2me-feature-media">
-            <figure class="news2me-feature-image">
-              <img
-                src="https://www-cdn.anthropic.com/images/4zrzovbb/website/1e2cc2ea6907317ec1daf171d8a8889c170fc727-1600x900.png"
-                alt="Daily: Your Everyday Journal"
-                loading="lazy"
-              />
-            </figure>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="news2me-section news2me-section--framed" aria-labelledby="news2me-updates-title">
-      <div class="news2me-shell">
-        <div class="news2me-divider" aria-hidden="true"></div>
-      </div>
-      <div class="news2me-shell">
-        <div class="news2me-updates-header">
-          <h2 id="news2me-updates-title" class="news2me-section-title">Latest updates</h2>
-        </div>
-
-        <div class="news2me-updates-grid">
-          <div class="news2me-updates-main">
-            <div class="news2me-update-head" aria-hidden="true">
-              <span>Date</span>
-              <span>Category</span>
-              <span>Title</span>
-            </div>
-
-            <ul class="news2me-update-list">
-              <li>
-                <div class="news2me-update-link">
-                  <div class="news2me-update-meta">
-                    <time class="news2me-update-time">Mar 26, 2026</time>
-                    <span class="news2me-update-category">App Release</span>
-                  </div>
-                  <span class="news2me-update-title">Submitted first version of Daily on the app store</span>
-                </div>
-              </li>
-            </ul>
-          </div>
-
-          <aside class="news2me-updates-aside" aria-hidden="true">
-            <div class="news2me-updates-illustration">
-              <img
-                src="/assets/appscreenshot.png"
-                alt="Daily app screenshot"
-                loading="lazy"
-              />
-            </div>
-          </aside>
-        </div>
-      </div>
-    </section>
-
+    <a href={appStoreUrl} class="store-badge" target="_blank" rel="noopener">
+      <img
+        src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83"
+        alt="Download on the App Store"
+        width="200"
+        height="67"
+        loading="lazy"
+      />
+    </a>
   </main>
 
-  <footer class="site-footer plain-page-footer">
-    <span class="footer-copy">&copy; <span id="year"></span></span>
-    <div class="footer-icons" aria-label="Social links">
-      <a href="https://github.com/johrmohr" target="_blank" rel="noopener" aria-label="GitHub" class="icon-link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2C6.48 2 2 6.58 2 12.26c0 4.52 2.87 8.35 6.84 9.7.5.09.68-.22.68-.48 0-.24-.01-.88-.01-1.73-2.78.61-3.37-1.2-3.37-1.2-.45-1.17-1.11-1.48-1.11-1.48-.91-.64.07-.63.07-.63 1 .07 1.53 1.05 1.53 1.05.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.36-2.22-.26-4.56-1.14-4.56-5.08 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.27 2.75 1.05.8-.23 1.65-.35 2.5-.35s1.7.12 2.5.35c1.91-1.32 2.75-1.05 2.75-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.95-2.34 4.81-4.57 5.06.36.32.67.94.67 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.58.69.48A10.05 10.05 0 0 0 22 12.26C22 6.58 17.52 2 12 2Z" fill="currentColor"/>
-        </svg>
-      </a>
-      <a href="https://www.linkedin.com/in/jordan-moreno-" target="_blank" rel="noopener" aria-label="LinkedIn" class="icon-link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6.94 7.5c0 .91-.73 1.65-1.64 1.65-.9 0-1.64-.74-1.64-1.65 0-.9.74-1.64 1.64-1.64.91 0 1.64.74 1.64 1.64ZM3.99 20.5h2.62V9.5H3.99v11Zm6.23-11h-2.6v11h2.6v-6.13c0-1.61.31-3.17 2.29-3.17 1.96 0 1.99 1.83 1.99 3.26v6.04h2.62v-6.83c0-3.37-.73-5.97-4.39-5.97-1.78 0-2.97.98-3.47 1.91h-.04v-1.61Z" fill="currentColor"/>
-        </svg>
-      </a>
-      <a href="https://x.com/johrmohr" target="_blank" rel="noopener" aria-label="X" class="icon-link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="currentColor"/>
-        </svg>
-      </a>
-      <a href="mailto:3moreno.jordan@gmail.com" aria-label="Email" class="icon-link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2" fill="none"/>
-          <polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2" fill="none"/>
-        </svg>
-      </a>
-    </div>
+  <footer class="footer">
+    <span>&copy; <span id="year"></span> Jordan Moreno</span>
+    <a href="/daily/privacypolicy">Privacy Policy</a>
   </footer>
 
   <script>
-    const now = new Date();
-    document.getElementById('year').textContent = now.getFullYear().toString();
-
-    const dateTarget = document.getElementById('news2me-current-date');
-    const dateFormatter = new Intl.DateTimeFormat('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    });
-
-    const updateCurrentDate = () => {
-      if (!dateTarget) return;
-      const current = new Date();
-      dateTarget.textContent = dateFormatter.format(current);
-    };
-
-    updateCurrentDate();
-
-    const scheduleDateRefresh = () => {
-      const current = new Date();
-      const nextMidnight = new Date(current);
-      nextMidnight.setHours(24, 0, 0, 0);
-      window.setTimeout(() => {
-        updateCurrentDate();
-        scheduleDateRefresh();
-      }, nextMidnight.getTime() - current.getTime());
-    };
-
-    scheduleDateRefresh();
+    document.getElementById('year').textContent = new Date().getFullYear().toString();
   </script>
 </body>
 </html>
+
+<style>
+  @font-face {
+    font-family: 'Playwrite IE';
+    src: url('/assets/fonts/PlaywriteIE-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :global(*) { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :global(html), :global(body) {
+    background: #000;
+    min-height: 100vh;
+  }
+
+  body {
+    color: #f2ede0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .page {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: clamp(56px, 10vh, 110px) 24px 48px;
+  }
+
+  .wordmark {
+    font-family: 'Playwrite IE', 'Snell Roundhand', cursive;
+    font-weight: 400;
+    font-size: clamp(36px, 7vw, 52px);
+    line-height: 1.5;
+  }
+
+  .headline {
+    margin: 28px auto 0;
+    max-width: 480px;
+    font-size: clamp(26px, 5.4vw, 38px);
+    font-weight: 700;
+    line-height: 1.22;
+    letter-spacing: -0.015em;
+    color: #ffffff;
+  }
+
+  /* Phone mockup — recreated from the App Store marketing shot */
+  .phone {
+    margin-top: 56px;
+    width: min(300px, 78vw);
+    aspect-ratio: 300 / 610;
+    border-radius: 48px;
+    padding: 10px;
+    background: linear-gradient(160deg, #3d3d40, #1c1c1e 45%, #2a2a2d);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 30px 80px rgba(0, 0, 0, 0.8);
+  }
+
+  .phone-screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 38px;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .phone-island {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 86px;
+    height: 24px;
+    border-radius: 999px;
+    background: #17171a;
+  }
+
+  .phone-icon {
+    width: 96px;
+    height: 96px;
+    border-radius: 22px;
+  }
+
+  .store-badge {
+    display: inline-block;
+    margin-top: 56px;
+  }
+
+  .store-badge img {
+    display: block;
+    width: 200px;
+    height: auto;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    padding: 24px 24px 40px;
+    font-size: 13px;
+    color: rgba(242, 237, 224, 0.55);
+  }
+
+  .footer a {
+    color: rgba(242, 237, 224, 0.55);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .footer a:hover,
+  .footer a:focus-visible {
+    color: #f2ede0;
+  }
+
+  .footer a:focus-visible {
+    outline: 2px solid rgba(242, 237, 224, 0.55);
+    outline-offset: 3px;
+  }
+</style>

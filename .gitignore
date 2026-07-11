@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# blog draft — local only while being reworked
+src/pages/_blog.astro

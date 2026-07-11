@@ -32,7 +32,7 @@ a {
   --hero-stack-top: clamp(136px, 15vh, 204px);
   --hero-stack-card-width: clamp(320px, 42vw, 560px);
   --hero-stack-height-multiplier: 0.57;
-  --hero-reveal-overlap: 0px;
+  --hero-reveal-overlap: clamp(110px, 16vh, 200px);
   --hero-blackhole-gap: 578px;
   min-height: 100vh;
   display: flex;
@@ -63,27 +63,25 @@ a {
   opacity: 0;
 }
 
-.hero-reveal-copy {
-  --copy-scroll-x: 0px;
-  --copy-scroll-y: 0px;
-  --copy-scroll-scale: 1;
-  --copy-scroll-opacity: 1;
-  --copy-scroll-blur: 0px;
+/* The pin is pure CSS: the track reserves the stretch of page the name should
+   hold for, and position: sticky keeps it composited — no per-scroll JS, no jitter.
+   The name releases when the track (sized to end at the black hole) runs out. */
+.hero-pin-track {
+  --hero-reveal-top: calc(var(--hero-stack-top) + (var(--hero-stack-card-width) * var(--hero-stack-height-multiplier)) - var(--hero-reveal-overlap));
   position: absolute;
-  top: calc(var(--hero-stack-top) + (var(--hero-stack-card-width) * var(--hero-stack-height-multiplier)) - var(--hero-reveal-overlap));
+  top: var(--hero-reveal-top);
   left: 50%;
-  z-index: 2;
+  transform: translateX(-50%);
   width: min(560px, calc(100vw - 40px));
-  opacity: var(--copy-scroll-opacity);
-  filter: blur(var(--copy-scroll-blur));
-  transform:
-    translateX(-50%)
-    translate3d(var(--copy-scroll-x), var(--copy-scroll-y), 0)
-    scale(var(--copy-scroll-scale));
-  transform-origin: center center;
-  text-align: center;
+  height: calc(var(--hero-blackhole-gap) + var(--hero-reveal-overlap) + 48px);
+  z-index: 2;
   pointer-events: none;
-  will-change: transform, opacity, filter;
+}
+
+.hero-reveal-copy {
+  position: sticky;
+  top: var(--hero-reveal-top);
+  text-align: center;
 }
 
 .hero-reveal-line {
@@ -281,7 +279,7 @@ a {
     margin-top: var(--hero-blackhole-gap);
   }
 
-  .hero-reveal-copy {
+  .hero-pin-track {
     width: min(520px, calc(100vw - 36px));
   }
 
@@ -302,8 +300,7 @@ a {
     --hero-blackhole-gap: clamp(214px, 40vw, 290px);
   }
 
-  .hero-reveal-copy {
-    top: calc(var(--hero-stack-top) + (var(--hero-stack-card-width) * var(--hero-stack-height-multiplier)) - var(--hero-reveal-overlap));
+  .hero-pin-track {
     width: min(340px, calc(100vw - 32px));
   }
 
@@ -415,6 +412,40 @@ a {
 
 .brand--home[data-brand-ready='true'] {
   opacity: 1;
+}
+
+/* Brand placed in the hero (replaces the old lead line) — same collapse
+   behavior, sized like the line it replaced and centered by the parent. */
+.brand--hero {
+  display: inline-flex;
+  font-size: clamp(20px, 2vw, 28px);
+  letter-spacing: -0.02em;
+  line-height: 1.18;
+  color: var(--text-hover);
+}
+
+/* Detached "hi, i'm" that falls into the black hole on scroll. Fixed-position
+   so it can fly independently of the pinned name; JS drives left/top/transform. */
+.brand-intro-ghost {
+  position: fixed;
+  z-index: 5;
+  font-weight: 700;
+  font-size: clamp(20px, 2vw, 28px);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  padding: 2px 0;
+  color: var(--text-hover);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: center center;
+  will-change: transform, opacity, filter;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-intro-ghost {
+    display: none;
+  }
 }
 
 .brand-home {

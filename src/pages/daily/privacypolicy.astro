@@ -1,50 +1,44 @@
 ---
-import '../../styles/site.css';
+// Privacy policy for the Daily app. This URL is on file with Apple for the
+// App Store listing — it must stay live at /daily/privacypolicy.
 ---
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Privacy Policy - Daily</title>
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" href="/favicon.png">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <title>Privacy Policy — Daily</title>
+  <meta name="description" content="Privacy policy for Daily, a private journaling app for iPhone.">
+  <link rel="icon" type="image/png" href="/assets/daily-icon.png">
+  <link rel="apple-touch-icon" href="/assets/daily-icon.png">
 </head>
-<body class="plain-page-body">
-  <header class="site-header">
-    <div class="site-header-leading">
-      <a href="/" class="brand brand--static" aria-label="Jordan Moreno">Jordan Moreno</a>
-    </div>
-    <div class="site-header-trailing">
-      <a href="/daily" class="header-link">Daily</a>
-      <a href="/blog" class="header-link">Blog</a>
-    </div>
-  </header>
+<body>
+  <main class="page">
+    <a href="/daily" class="back">&larr; Daily</a>
 
-  <main class="privacy-page">
-    <div class="privacy-content">
-      <h1>Privacy Policy for Daily</h1>
-      <p class="privacy-updated"><em>Last updated: March 27, 2026</em></p>
+    <h1>Privacy Policy for Daily</h1>
+    <p class="updated">Last updated: July 10, 2026</p>
 
-      <p>Daily is a personal journaling app. Your privacy is important to us.</p>
+    <p>Daily is a personal journaling app. Your privacy is important to us.</p>
 
-      <h2>Data Collection</h2>
-      <p>Daily does not collect, store, or transmit any personal data to external servers. All journal entries, photos, and attachments are stored locally on your device.</p>
+    <h2>Data Collection</h2>
+    <p>Daily has no servers and does not collect, store, or transmit any personal data. All journal entries, photos, and attachments are stored locally on your device.</p>
 
-      <h2>Third-Party Services</h2>
-      <p>Daily does not use any third-party analytics, advertising, or tracking services.</p>
+    <h2>Voice Transcription</h2>
+    <p>Voice notes are transcribed using Apple's Speech framework. On devices that support it, transcription happens entirely on-device. On devices that do not, audio may be processed by Apple's servers under <a href="https://www.apple.com/legal/privacy/">Apple's privacy policy</a>. Daily itself never receives this data.</p>
 
-      <h2>Biometric Data</h2>
-      <p>Daily offers an optional Face ID lock feature. Biometric authentication is handled entirely by your device's operating system. Daily does not access, store, or process any biometric data.</p>
+    <h2>Third-Party Services</h2>
+    <p>Daily does not use any third-party analytics, advertising, or tracking services.</p>
 
-      <h2>Contact</h2>
-      <p>If you have questions about this privacy policy, you can reach me at <a href="mailto:jordan@accentuateai.app">jordan@accentuateai.app</a></p>
-    </div>
+    <h2>Biometric Data</h2>
+    <p>Daily offers an optional Face ID lock feature. Biometric authentication is handled entirely by your device's operating system. Daily does not access, store, or process any biometric data.</p>
+
+    <h2>Contact</h2>
+    <p>If you have questions about this privacy policy, you can reach me at <a href="mailto:3moreno.jordan@gmail.com">3moreno.jordan@gmail.com</a></p>
   </main>
 
-  <footer class="site-footer plain-page-footer">
-    <span class="footer-copy">&copy; <span id="year"></span></span>
+  <footer class="footer">
+    <span>&copy; <span id="year"></span> Jordan Moreno</span>
   </footer>
 
   <script>
@@ -52,3 +46,88 @@ import '../../styles/site.css';
   </script>
 </body>
 </html>
+
+<style>
+  :global(*) { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :global(html), :global(body) {
+    background: #000;
+    min-height: 100vh;
+  }
+
+  body {
+    color: #f2ede0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .page {
+    flex: 1;
+    width: 100%;
+    max-width: 620px;
+    margin: 0 auto;
+    padding: clamp(56px, 10vh, 110px) 24px 48px;
+  }
+
+  .back {
+    display: inline-block;
+    margin-bottom: 40px;
+    font-size: 14px;
+    color: rgba(242, 237, 224, 0.55);
+    text-decoration: none;
+  }
+
+  .back:hover,
+  .back:focus-visible {
+    color: #f2ede0;
+  }
+
+  h1 {
+    font-size: clamp(26px, 5vw, 32px);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .updated {
+    margin-top: 8px;
+    font-size: 14px;
+    color: rgba(242, 237, 224, 0.55);
+  }
+
+  h2 {
+    margin-top: 40px;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  p {
+    margin-top: 12px;
+    color: rgba(242, 237, 224, 0.75);
+  }
+
+  a {
+    color: rgba(242, 237, 224, 0.75);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  a:hover { color: #f2ede0; }
+
+  a:focus-visible {
+    outline: 2px solid rgba(242, 237, 224, 0.55);
+    outline-offset: 3px;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: center;
+    padding: 24px 24px 40px;
+    font-size: 13px;
+    color: rgba(242, 237, 224, 0.55);
+  }
+</style>
