@@ -132,45 +132,17 @@ h1{margin:0;font-weight:600;font-size:clamp(24px,3vw,34px);line-height:1.15;lett
 }
 @media (prefers-reduced-motion: reduce){ .demo-sec,.btn{transition:none} }
 .demo.clean .demo-tools,.demo.clean .demo-close{display:none}
+/* the site: only the journey, from the first paint (the prototype's review page stays out of sight) */
+html,body{background:#000;overflow:hidden}
+.demo-sec:not(.s1){visibility:hidden} .demo-up{opacity:0;pointer-events:none}
+.demo-tools,.demo-close{display:none}
 .demo.still .demo-sec,.demo.still .demo-top button,.demo.still .demo-hint{transition:none!important}
 </style>
 
-<main class="wrap">
-  <h1>Black hole to the open sea, one continuous take</h1>
-  <p class="sub">As NASA's band of light flattens, the sun or the moon rises out of it in the same shot, and keeps rising while the camera pulls back and the open sea comes up. By day it rises as the sun, by night as the moon, picked from your local time.</p>
-
-  <div class="stage" id="stage">
-    <canvas id="gl" aria-label="Animated journey from the black hole to the sea"></canvas>
-    <div class="loading" id="loading">loading NASA frames</div>
-    <div class="tag" id="tag"><span class="dot nasa"></span><span></span></div>
-  </div>
-  <div class="scrub">
-    <input type="range" id="scrub" min="0" max="1000" value="0" aria-label="Scrub the journey">
-    <div class="segbar" id="segbar" aria-hidden="true"></div>
-    <div class="marks" id="marks" aria-hidden="true"></div>
-  </div>
-  <div class="controls">
-    <button class="btn" id="play">Pause</button>
-    <div class="seg" role="group" aria-label="Speed"><button data-speed="0.5" aria-pressed="false">0.5×</button><button data-speed="1" aria-pressed="true">1×</button></div>
-    <div class="seg" role="group" aria-label="Ending"><button data-end="auto" aria-pressed="false">auto (your time)</button><button data-end="sun" aria-pressed="false">sun</button><button data-end="moon" data-default aria-pressed="false">moon</button></div>
-    <label class="toggle"><input type="checkbox" id="t-print" checked> print texture</label>
-    <button class="btn" id="record-review" hidden>Record selected ending</button>
-    <button class="btn" id="save-review-frame" hidden>Save ending frame</button>
-    <button class="btn primary" id="open-demo">Preview as the website</button>
-    <span class="time" id="time">0.0 s</span>
-  </div>
-  <p class="foot" id="capture-status" role="status" hidden></p>
-  <div class="legend"><span><span class="dot nasa"></span>NASA simulation frames</span><span><span class="dot art"></span>rendered</span><span><span class="dot rest"></span>section at rest</span></div>
-
-  <div class="strip" id="strip" aria-label="Frames from the transition"></div>
-
-
-  <p class="foot">Black hole: real frames from NASA Goddard's 360° plunge render (SVS 14576, J. Schnittman and B. Powell), camera re-aimed along the same trajectory. In NASA's last frames the top of the sun or the moon is painted in, rising out of the band of light; from there Higgsfield (Seedance 2.5, video extension) continues that footage, eased so its speed matches NASA's at the join, while the line-and-dot print dissolves. At rest a Higgsfield loop holds. The sea rendered in the browser remains as a fallback.</p>
-</main>
 
 <video id="bh" muted playsinline preload="auto" aria-hidden="true" style="position:fixed;left:0;top:0;width:2px;height:2px;opacity:.01;pointer-events:none"></video>
 
-<div class="demo" id="demo" hidden role="dialog" aria-modal="true" aria-label="Website preview">
+<div class="demo" id="demo" role="dialog" aria-modal="true" aria-label="Website preview">
   <canvas id="demo-gl"></canvas>
   <nav class="demo-top" aria-label="Sections"><button data-go="0" aria-current="true">intro</button><button data-go="1">work</button><button data-go="2">projects</button></nav>
   <button class="btn demo-close" id="demo-close">Close</button>
@@ -696,94 +668,19 @@ class Renderer {
   }
 }
 
-/* ---------- player ---------- */
+/* ---------- shared helpers ---------- */
 const $ = s => document.querySelector(s);
 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let reviewSize = false, forceW = 0;
-const R = new Renderer($('#gl'));
 const END = K[2] + 2.5;
-const SEGS = [
-  { t0: 0, t1: K[1], kind: 'nasa', label: 'NASA frames · the approach' },
-  { t0: K[1], t1: K[1] + SWITCH, kind: 'nasa', label: 'NASA frames · the plunge, the band of light flattens' },
-  { t0: K[1] + SWITCH, t1: K[2], kind: 'art', label: 'Higgsfield continues the shot · the sun or the moon rises out of the line' },
-  { t0: K[2], t1: END, kind: 'rest', label: 'The open sea' },
-];
-const S = { J: 0, playing: !reduce, speed: 1, last: 0, live: 0, print: true, visible: true };
-let capture = null;
-$('#segbar').innerHTML = SEGS.map(s => `<i class="${s.kind}" style="flex:${(s.t1 - s.t0) / END}"></i>`).join('');
-$('#marks').innerHTML = [['1 intro', K[0]], ['2 work', K[1]], ['3 projects + contact', K[2]]].map(([n, t]) => `<span style="left:${Math.max(3, Math.min(97, t / END * 100))}%">${n}</span>`).join('');
-const segAt = J => SEGS.find(s => J >= s.t0 && J <= s.t1) || SEGS[SEGS.length - 1];
-const nasaLabel = J => J <= K[1] ? nasaApproach(J) : J <= K[1] + SWITCH + .1 ? nasaT(J - K[1]) : null;
-function draw() {
-  R.fit(); R.frame(S.J, S.live, S.print);
-  const s = segAt(S.J), n = nasaLabel(S.J); const tag = $('#tag'); tag.querySelector('.dot').className = 'dot ' + s.kind; tag.querySelector('span:last-child').textContent = s.label + (n != null ? `  ·  NASA ${n.toFixed(1)} s` : '');
-  $('#scrub').value = String(Math.round(S.J / END * 1000)); $('#time').textContent = `${S.J.toFixed(1)} s / ${END.toFixed(1)} s`;
-}
-function tick(now) {
-  const dt = Math.min(.05, (now - (S.last || now)) / 1000); S.last = now;
-  if (owner === 'player' && (S.visible || capture) && document.visibilityState === 'visible') {
-    S.live += dt;
-    if (S.playing) { S.J += dt * S.speed; if (S.J > END) { if (capture) { S.J = END; setPlaying(false); } else S.J = 0; } }
-    syncVideo(footageTime(S.J), S.playing && S.J < footEnd(), S.speed); syncClips(S.J, S.playing, S.speed);
-    draw();
-    if (capture && !S.playing && S.J === END && !capture.stopping) { capture.stopping = true; setTimeout(() => capture.recorder.stop(), 150); }
-  }
-  requestAnimationFrame(tick);
-}
-function setPlaying(p) { S.playing = p; $('#play').textContent = p ? 'Pause' : 'Play'; }
-$('#play').addEventListener('click', () => setPlaying(!S.playing));
-$('#scrub').addEventListener('input', e => { S.J = +e.target.value / 1000 * END; setPlaying(false); });
-document.querySelectorAll('[data-speed]').forEach(b => b.addEventListener('click', () => { S.speed = +b.dataset.speed; document.querySelectorAll('[data-speed]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); }));
-$('#t-print').addEventListener('change', e => { S.print = e.target.checked; });
-function setEnding(e) { ENDING = e; need(ending()); document.querySelectorAll('[data-end]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.end === e))); }
-document.querySelectorAll('[data-end]').forEach(b => b.addEventListener('click', () => setEnding(b.dataset.end)));
-
-/* review captures: only when served by scripts/mockup-review-server.py, which saves them under output/animation-review */
-const captureHost = location.port === '8765';
-$('#record-review').hidden = $('#save-review-frame').hidden = !captureHost;
-function captureStatus(message) { const el = $('#capture-status'); el.hidden = !message; el.textContent = message; }
-async function uploadReview(name, blob) { const res = await fetch(`/__review_capture/${name}`, { method: 'POST', body: blob }); if (!res.ok) throw new Error(`Preview server returned ${res.status}`); return (await res.json()).path; }
-$('#record-review').addEventListener('click', async () => {
-  if (capture || !vidReady || !R.canvas.captureStream || typeof MediaRecorder === 'undefined') return;
-  const key = ending(), button = $('#record-review');
-  button.disabled = $('#save-review-frame').disabled = true; captureStatus(`Recording the ${key === 'sun' ? 'sunrise' : 'moonrise'} take…`);
-  try {
-    setPlaying(false); await seekVideo(0); S.J = 0; S.live = 0; S.speed = 1; S.last = performance.now(); reviewSize = true; draw();
-    const stream = R.canvas.captureStream(30), mime = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'].find(v => MediaRecorder.isTypeSupported(v));
-    const recorder = new MediaRecorder(stream, { ...(mime ? { mimeType: mime } : {}), videoBitsPerSecond: 9000000 }), chunks = [];
-    capture = { recorder, stopping: false };
-    recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
-    recorder.onerror = () => { captureStatus('The recording failed. Please try again.'); setPlaying(false); stream.getTracks().forEach(t => t.stop()); capture = null; button.disabled = $('#save-review-frame').disabled = false; };
-    recorder.onstop = async () => { stream.getTracks().forEach(t => t.stop());
-      try { const path = await uploadReview(`${key}rise.webm`, new Blob(chunks, { type: recorder.mimeType })); captureStatus(`Saved ${key === 'sun' ? 'sunrise' : 'moonrise'} review video to ${path}`); } catch (error) { captureStatus(`Recording complete, but saving failed: ${error.message}`); }
-      capture = null; reviewSize = false; draw(); button.disabled = $('#save-review-frame').disabled = false; };
-    recorder.start(250); setPlaying(true);
-  } catch (error) { capture = null; reviewSize = false; button.disabled = $('#save-review-frame').disabled = false; captureStatus(`Recording could not start: ${error.message}`); }
-});
-$('#save-review-frame').addEventListener('click', async () => {
-  if (capture) return; const key = ending(), button = $('#save-review-frame'); button.disabled = true;
-  try { setPlaying(false); S.J = K[2]; await seekVideo(footageTime(S.J)); reviewSize = true; draw(); const blob = await new Promise(resolve => R.canvas.toBlob(resolve, 'image/png')); if (!blob) throw new Error('Canvas capture failed'); const path = await uploadReview(`${key}rise.png`, blob); captureStatus(`Saved ${key === 'sun' ? 'sunrise' : 'moonrise'} frame to ${path}`); } catch (error) { captureStatus(`Frame save failed: ${error.message}`); }
-  reviewSize = false; draw(); button.disabled = false;
-});
-new IntersectionObserver(es => es.forEach(e => S.visible = e.isIntersecting), { threshold: .05 }).observe($('#stage'));
-
-const FRAMES = [[K[1] + 2.4, 'NASA · the plunge', 'nasa', null], [K[1] + SWITCH, 'the handoff, before the arch', 'nasa', null], [K[1] + SWITCH + .8, 'it rises out of the line', 'art', null], [K[1] + SWITCH + 2.2, 'the sea comes up', 'art', null], [K[1] + SWITCH + 4.5, 'the camera pulls back', 'art', null], [K[1] + SWITCH + 6.5, 'coming to rest', 'art', null], [K[2], 'sunrise', 'rest', 'sun'], [K[2], 'moonrise', 'rest', 'moon']];
-let stripBuilt = false;
-async function buildStrip() {
-  if (stripBuilt) return; stripBuilt = true;
-  const strip = $('#strip'); strip.innerHTML = FRAMES.map(([J, cap, k, e]) => `<button class="frame" data-j="${J}" data-e="${e || ''}"><canvas width="480" height="270"></canvas><span class="cap"><span class="dot ${k}"></span>${cap}</span></button>`).join('');
-  owner = 'strip'; const was = S.playing;
-  for (const btn of strip.querySelectorAll('.frame')) { const J = +btn.dataset.j, e = btn.dataset.e; await seekVideo(footageTime(J)); const keep = ENDING; if (e) ENDING = e; R.fit(); R.frame(J, 4, S.print); ENDING = keep; btn.querySelector('canvas').getContext('2d').drawImage(R.canvas, 0, 0, 480, 270); btn.addEventListener('click', () => { S.J = J; if (e) setEnding(e); setPlaying(false); $('#stage').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); }); }
-  owner = 'player'; setPlaying(was);
-}
+function setEnding(e) { ENDING = e; need(ending()); }
 
 /* ---------- website preview: three sections over the journey ---------- */
 const demo = $('#demo'), dgl = $('#demo-gl'); let DR = null;
 const D = { i: 0, J: 0, T: 0, from: 0, to: 0, t0: 0, dur: 0, busy: false, speed: 1, live: 0, last: 0, open: false, focus: null, target: 0, pending: 0 };
 function sizeDemo() { const w = window.innerWidth, h = window.innerHeight; const sc = Math.max(w / 16, h / 9); dgl.style.width = sc * 16 + 'px'; dgl.style.height = sc * 9 + 'px'; dgl.style.left = (w - sc * 16) / 2 + 'px'; dgl.style.top = (h - sc * 9) / 2 + 'px'; }
 function openDemo() { if (!DR) DR = new Renderer(dgl); D.open = true; SITE = true; owner = 'demo'; D.focus = document.activeElement; demo.hidden = false; document.body.style.overflow = 'hidden'; D.i = 0; D.J = 0; D.T = 0; D.busy = false; sizeDemo(); show(0); requestAnimationFrame(demoTick); $('#demo-close').focus(); }
-function closeDemo() { return;   // on the site the preview is the page
- D.open = false; SITE = false; BACK = false; owner = 'player'; demo.hidden = true; document.body.style.overflow = ''; if (D.focus && D.focus !== document.body) D.focus.focus(); else $('#open-demo').focus(); buildStrip(); }
+function closeDemo() {}   // the journey is the page
 function show(i) { demo.querySelectorAll('.demo-sec').forEach(s => { const on = +s.dataset.s === i; s.classList.toggle('on', on); s.classList.remove('off'); s.inert = !on; }); demo.querySelectorAll('[data-go]').forEach(b => b.setAttribute('aria-current', String(+b.dataset.go === i))); }
 function hideAll() { demo.querySelectorAll('.demo-sec.on').forEach(s => { s.classList.remove('on'); s.inert = true; }); }
 /* the page scrolls with the journey: section k sits k screens down; at site-cut time T the view is at posAt(T) screens, easing
@@ -828,7 +725,7 @@ demo.addEventListener('keydown', e => {
 demo.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => goTo(+b.dataset.go)));
 $('#demo-hint').addEventListener('click', () => goTo(D.i + 1)); $('#demo-up').addEventListener('click', () => goTo(D.i - 1));
 demo.querySelectorAll('[data-ds]').forEach(b => b.addEventListener('click', () => { D.speed = +b.dataset.ds; demo.querySelectorAll('[data-ds]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); }));
-$('#open-demo').addEventListener('click', openDemo); $('#demo-close').addEventListener('click', closeDemo);
+
 window.addEventListener('resize', () => { if (D.open) sizeDemo(); });
 document.querySelectorAll('.yr').forEach(e => { e.textContent = String(new Date().getFullYear()); });
 
@@ -929,20 +826,16 @@ async function exportRun(kind, end, fps = 30, url = 'http://127.0.0.1:4412/', pr
 }
 
 /* debug hook: render any moment, for frame checks and exports */
-window.__journey = { K, END, LOCK, siteFrame, setEnding, exportRun, WALK_LEN, go: goTo, get state() { const sc = site() || {}, v = AV(); return { T: D.T, J: D.J, i: D.i, busy: D.busy, back: BACK, leave: LEAVE ? LEAVE.a : 0, video: v === sc.r ? 'reversed' : v === sc.f ? 'site' : 'journey' }; }, videos: { JV, SC, SCR }, stills(on) { STILLS = on; if (!on) FOOT_IMG = CLIP_IMG = null; }, CLIP_META, CLIPS, get canvas() { return R.canvas; }, at(J) { S.J = J; setPlaying(false); }, async render(J, live = 4, end, width = 0) { owner = 'strip'; if (end) setEnding(end); forceW = width; S.J = J; setPlaying(false); await seekVideo(footageTime(J)); S.live = live; draw(); forceW = 0; owner = 'player'; } };
+window.__journey = { K, END, LOCK, siteFrame, setEnding, exportRun, WALK_LEN, go: goTo, get state() { const sc = site() || {}, v = AV(); return { T: D.T, J: D.J, i: D.i, busy: D.busy, back: BACK, leave: LEAVE ? LEAVE.a : 0, video: v === sc.r ? 'reversed' : v === sc.f ? 'site' : 'journey' }; }, videos: { JV, SC, SCR }, stills(on) { STILLS = on; if (!on) FOOT_IMG = CLIP_IMG = null; }, CLIP_META, CLIPS };
 
-/* ---------- boot: the website preview opens first; #review goes straight to the player ---------- */
-setPlaying(!reduce);
+/* ---------- boot: straight into the journey ---------- */
 const boot = async () => {
-  await captureLock(); await seekVideo(0);
-  $('#loading').hidden = true; S.J = reduce ? K[2] : 0; document.body.dataset.reviewReady = 'true';
+  await captureLock(); document.body.dataset.reviewReady = 'true';
   const q = new URLSearchParams(location.hash.slice(1));
   setEnding(q.get('end') || ENDING); demo.classList.add('clean');
-  if (false) buildStrip();
-  else { openDemo(); const i = +q.get('site') || 0; if (i) { D.i = i; D.T = TS[i]; D.J = K[i]; show(i); } }
+  openDemo(); const i = +q.get('site') || 0; if (i) { D.i = i; D.T = TS[i]; D.J = K[i]; show(i); }
 };
 VID.addEventListener('loadeddata', boot, { once: true });
 (async () => { try { const r = await fetch('bh-journey.mp4'); if (!r.ok) throw new Error(r.status); VID.src = URL.createObjectURL(await r.blob()); } catch { VID.src = 'bh-journey.mp4'; } VID.load(); })();
-requestAnimationFrame(tick);
 })();
 </script>
