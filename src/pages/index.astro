@@ -689,7 +689,7 @@ const GAP = 2.4;   // sections sit this many screens apart, so the text keeps pa
 const posAt = T => { const p = clamp(T / SMOVE, 0, 2), i = Math.min(1, Math.floor(p)); return i + smooth(p - i); };
 function place(pos) {
   const h = demo.clientHeight || innerHeight;
-  demo.querySelectorAll('.demo-sec').forEach(s => { const d = +s.dataset.s - pos; s.style.transform = `translateY(${(d * GAP * h).toFixed(1)}px)`; s.style.visibility = Math.abs(d * GAP) < 1.05 ? '' : 'hidden'; });
+  demo.querySelectorAll('.demo-sec').forEach(s => { const d = +s.dataset.s - pos; s.style.transform = `translateY(${(d * GAP * h).toFixed(1)}px)`; s.style.visibility = Math.abs(d * GAP) < 1.05 ? 'visible' : 'hidden'; });
   const near = Math.abs(pos - Math.round(pos)) < .02, at = Math.round(pos);   // arrows only at rest: down below intro and work, up above work and projects
   for (const [el, on] of [[$('#demo-hint'), near && at < 2], [$('#demo-up'), near && at > 0]]) { el.style.opacity = on ? '1' : '0'; el.style.pointerEvents = on ? 'auto' : 'none'; el.tabIndex = on ? 0 : -1; }
 }
