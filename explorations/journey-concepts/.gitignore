@@ -1,0 +1,5 @@
+# export stills (regenerate with ffmpeg, see README) and superseded clips
+frames/
+media/gen_*.mp4
+_selftest.html
+__pycache__/

@@ -1,0 +1,32 @@
+{
+ "journey_moon": {
+  "fps": 30,
+  "n": 437,
+  "shot": 7.614
+ },
+ "journey_moon_site": {
+  "fps": 60,
+  "n": 315,
+  "speed": 1.3
+ },
+ "journey_sun": {
+  "fps": 30,
+  "n": 437,
+  "shot": 7.614
+ },
+ "journey_sun_site": {
+  "fps": 60,
+  "n": 315,
+  "speed": 1.3
+ },
+ "loop_moon": {
+  "fps": 24,
+  "in": 0.5,
+  "n": 97
+ },
+ "loop_sun": {
+  "fps": 24,
+  "in": 0.5,
+  "n": 97
+ }
+}
