@@ -71,9 +71,11 @@ h1{margin:0;font-weight:600;font-size:clamp(24px,3vw,34px);line-height:1.15;lett
 
 .demo{position:fixed;inset:0;z-index:50;background:#000;overflow:hidden;color:#f1ece2}
 .demo canvas{position:absolute;display:block}
-.demo-top{position:absolute;top:calc(env(safe-area-inset-top,0px) + 16px);left:50%;transform:translateX(-50%);display:flex;gap:4px;padding:4px;border-radius:999px;background:rgba(8,10,14,.42);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);z-index:3;max-width:calc(100% - 32px)}
-.demo-top button{appearance:none;border:0;background:transparent;border-radius:999px;padding:6px 12px;font:600 14px/20px var(--sans);color:rgba(241,236,226,.72);cursor:pointer;white-space:nowrap;transition:background .5s var(--spring),color .5s var(--spring)}
-.demo-top button[aria-current="true"]{background:rgba(241,236,226,.14);color:#fff}
+.demo-head{position:absolute;top:calc(env(safe-area-inset-top,0px) + 16px);left:50%;transform:translateX(-50%);width:100%;max-width:1200px;box-sizing:border-box;padding:0 48px;display:flex;justify-content:flex-end;z-index:3;pointer-events:none}   /* the social links, on every section */
+.demo-head .icons{display:flex;align-items:center;gap:16px;pointer-events:auto}
+.demo-head .icons a{display:flex;padding:4px;opacity:.75;transition:opacity .2s}
+.demo-head .icons a:hover{opacity:1}
+.demo-head .icons img{display:block;width:18px;height:18px;filter:drop-shadow(0 1px 6px rgba(0,0,0,.7))}
 .demo-close{position:absolute;top:calc(env(safe-area-inset-top,0px) + 16px);right:16px;z-index:4}
 .demo .btn{background:rgba(8,10,14,.55);border-color:rgba(255,255,255,.16);color:#f1ece2;backdrop-filter:blur(10px)}
 .demo-tools{position:absolute;left:16px;top:calc(env(safe-area-inset-top,0px) + 16px);z-index:4;display:flex;gap:8px;flex-wrap:wrap}   /* prototype controls, clear of the site's footer */
@@ -108,13 +110,9 @@ h1{margin:0;font-weight:600;font-size:clamp(24px,3vw,34px);line-height:1.15;lett
 .s3 .ring img{display:block;width:48px;height:48px;opacity:.8;filter:drop-shadow(0 0 6px rgba(0,0,0,.9));transition:opacity .2s}   /* legible over the path of light */
 .s3 .ring a:hover img{opacity:1}
 .foot2{width:100%;max-width:1200px;box-sizing:border-box;padding:14px 48px calc(env(safe-area-inset-bottom,0px) + 22px);display:flex;align-items:center;gap:18px 28px;flex-wrap:wrap;color:rgba(241,236,226,.75);font-size:14px;line-height:20px}
-.foot2 .icons{display:flex;align-items:center;gap:16px;margin-left:auto}
-.foot2 .icons a{display:flex;opacity:.75;transition:opacity .2s}
-.foot2 .icons a:hover{opacity:1}
-.foot2 .icons img{display:block;width:18px;height:18px;filter:drop-shadow(0 1px 6px rgba(0,0,0,.7))}
 .demo-hint,.demo-up{position:absolute;left:50%;transform:translateX(-50%);z-index:3;appearance:none;border:0;background:none;padding:10px;cursor:pointer;transition:opacity .4s}
 .demo-hint{bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
-.demo-up{top:calc(env(safe-area-inset-top,0px) + 58px)}
+.demo-up{top:calc(env(safe-area-inset-top,0px) + 12px)}
 .demo-up img{display:block;opacity:.8;filter:drop-shadow(0 1px 6px rgba(0,0,0,.7))}
 .demo-hint:hover img,.demo-up:hover img{opacity:1}
 .demo-hint img{display:block;opacity:.8;filter:drop-shadow(0 1px 6px rgba(0,0,0,.7));animation:bob 2s ease-in-out infinite}
@@ -125,6 +123,7 @@ h1{margin:0;font-weight:600;font-size:clamp(24px,3vw,34px);line-height:1.15;lett
   .walk-grid{grid-template-columns:1fr}
   .s3 .proj{width:calc(100% - 32px)}
   .foot2{padding:12px 16px calc(env(safe-area-inset-bottom,0px) + 16px)}
+  .demo-head{padding:0 16px}
   .pcard b{display:none}
   .time{margin-left:0}
   .demo-tools{top:calc(env(safe-area-inset-top,0px) + 64px);right:16px}
@@ -136,7 +135,7 @@ h1{margin:0;font-weight:600;font-size:clamp(24px,3vw,34px);line-height:1.15;lett
 html,body{background:#000;overflow:hidden}
 .demo-sec:not(.s1){visibility:hidden} .demo-up{opacity:0;pointer-events:none}
 .demo-tools,.demo-close{display:none}
-.demo.still .demo-sec,.demo.still .demo-top button,.demo.still .demo-hint{transition:none!important}
+.demo.still .demo-sec,.demo.still .demo-hint{transition:none!important}
 </style>
 
 
@@ -144,7 +143,14 @@ html,body{background:#000;overflow:hidden}
 
 <div class="demo" id="demo" role="dialog" aria-modal="true" aria-label="Website preview">
   <canvas id="demo-gl"></canvas>
-  <nav class="demo-top" aria-label="Sections"><button data-go="0" aria-current="true">intro</button><button data-go="1">work</button><button data-go="2">projects</button></nav>
+  <header class="demo-head">
+    <div class="icons" aria-label="Social links">
+      <a href="https://github.com/johrmohr" target="_blank" rel="noopener" aria-label="GitHub"><img src="img/icon-github.svg" width="18" height="18" alt=""></a>
+      <a href="https://www.linkedin.com/in/jordan-moreno-" target="_blank" rel="noopener" aria-label="LinkedIn"><img src="img/icon-linkedin.svg" width="18" height="18" alt=""></a>
+      <a href="https://x.com/johrmohr" target="_blank" rel="noopener" aria-label="X"><img src="img/icon-x.svg" width="18" height="18" alt=""></a>
+      <a href="mailto:3moreno.jordan@gmail.com" aria-label="Email"><img src="img/icon-email.svg" width="18" height="18" alt=""></a>
+    </div>
+  </header>
   <button class="btn demo-close" id="demo-close">Close</button>
   <section class="demo-sec s1 shadow" data-s="0">
     <span class="hi">hi, i'm</span>
@@ -179,12 +185,6 @@ html,body{background:#000;overflow:hidden}
     <nav class="ring" aria-label="LPN webring"><a class="arrow" href="https://webring.lpnuci.com/?nav=prev&amp;from=jordanmoreno.me" target="_blank" rel="noopener" aria-label="Previous site in the LPN webring">&lt;</a><a href="https://webring.lpnuci.com/" target="_blank" rel="noopener" aria-label="LPN webring"><img src="img/lpn-webring-logo.png" width="48" height="48" alt="LPN Webring"></a><a class="arrow" href="https://webring.lpnuci.com/?nav=next&amp;from=jordanmoreno.me" target="_blank" rel="noopener" aria-label="Next site in the LPN webring">&gt;</a></nav>
     <footer class="foot2">
       <span>&copy; <span class="yr">2026</span></span>
-      <div class="icons" aria-label="Social links">
-        <a href="https://github.com/johrmohr" target="_blank" rel="noopener" aria-label="GitHub"><img src="img/icon-github.svg" width="18" height="18" alt=""></a>
-        <a href="https://www.linkedin.com/in/jordan-moreno-" target="_blank" rel="noopener" aria-label="LinkedIn"><img src="img/icon-linkedin.svg" width="18" height="18" alt=""></a>
-        <a href="https://x.com/johrmohr" target="_blank" rel="noopener" aria-label="X"><img src="img/icon-x.svg" width="18" height="18" alt=""></a>
-        <a href="mailto:3moreno.jordan@gmail.com" aria-label="Email"><img src="img/icon-email.svg" width="18" height="18" alt=""></a>
-      </div>
     </footer>
   </section>
   <button class="demo-hint" id="demo-hint" aria-label="Next section"><img src="img/icon-down.svg" width="20" height="20" alt=""></button>
@@ -681,7 +681,7 @@ const D = { i: 0, J: 0, T: 0, from: 0, to: 0, t0: 0, dur: 0, busy: false, speed:
 function sizeDemo() { const w = window.innerWidth, h = window.innerHeight; const sc = Math.max(w / 16, h / 9); dgl.style.width = sc * 16 + 'px'; dgl.style.height = sc * 9 + 'px'; dgl.style.left = (w - sc * 16) / 2 + 'px'; dgl.style.top = (h - sc * 9) / 2 + 'px'; }
 function openDemo() { if (!DR) DR = new Renderer(dgl); D.open = true; SITE = true; owner = 'demo'; D.focus = document.activeElement; demo.hidden = false; document.body.style.overflow = 'hidden'; D.i = 0; D.J = 0; D.T = 0; D.busy = false; sizeDemo(); show(0); requestAnimationFrame(demoTick); $('#demo-close').focus(); }
 function closeDemo() {}   // the journey is the page
-function show(i) { demo.querySelectorAll('.demo-sec').forEach(s => { const on = +s.dataset.s === i; s.classList.toggle('on', on); s.classList.remove('off'); s.inert = !on; }); demo.querySelectorAll('[data-go]').forEach(b => b.setAttribute('aria-current', String(+b.dataset.go === i))); }
+function show(i) { demo.querySelectorAll('.demo-sec').forEach(s => { const on = +s.dataset.s === i; s.classList.toggle('on', on); s.classList.remove('off'); s.inert = !on; }); }
 function hideAll() { demo.querySelectorAll('.demo-sec.on').forEach(s => { s.classList.remove('on'); s.inert = true; }); }
 /* the page scrolls with the journey: section k sits k screens down; at site-cut time T the view is at posAt(T) screens, easing
    in and out of each section like a scroll that settles */
@@ -722,7 +722,6 @@ demo.addEventListener('keydown', e => {
   if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); goTo(D.i - 1); }
   if (e.key === 'Tab') { const f = [...demo.querySelectorAll('button, a[href]')].filter(el => !el.closest('[inert]') && el.offsetParent !== null); if (!f.length) return; if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); } else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); } }
 });
-demo.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => goTo(+b.dataset.go)));
 $('#demo-hint').addEventListener('click', () => goTo(D.i + 1)); $('#demo-up').addEventListener('click', () => goTo(D.i - 1));
 demo.querySelectorAll('[data-ds]').forEach(b => b.addEventListener('click', () => { D.speed = +b.dataset.ds; demo.querySelectorAll('[data-ds]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); }));
 
@@ -779,13 +778,12 @@ function seekExact(ft) { const V = jv() ? jv().el : VID; return new Promise(res 
 async function siteFrame(J, i, a, live, print = true, hold = 0, T = null) {
   if (!D.open) openDemo(); D.busy = false; D.J = J; if (!STILLS) SITE = false; D.live = live; demo.classList.add('still');   // live, it seeks the journey itself
   demo.querySelectorAll('.demo-sec').forEach(s => { const on = +s.dataset.s === i; s.classList.toggle('on', on); s.classList.remove('off'); });
-  demo.querySelectorAll('[data-go]').forEach(b => b.setAttribute('aria-current', String(+b.dataset.go === i)));
   if (STILLS) { FOOT_IMG = await footFrame(footageTime(J), T); CLIP_IMG = await clipFrame(clipAt(J, hold)); } else await seekExact(footageTime(J));
   DR.fit(2000); DR.frame(J, live, print, hold);
   const w = innerWidth, h = innerHeight, out = layer(w, h), ctx = out.getContext('2d'), gr = dgl.getBoundingClientRect();
   ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h); ctx.drawImage(dgl, gr.left, gr.top, gr.width, gr.height);
   if (a < 0) return out;          // film only: no page on top
-  drawTree(ctx, $('.demo-top'));
+  drawTree(ctx, $('.demo-head'));
   place(posAt(T ?? TS[i])); demo.querySelectorAll('.demo-sec').forEach(s => drawTree(ctx, s)); drawTree(ctx, $('#demo-hint')); drawTree(ctx, $('#demo-up'));
   return out;
 }
